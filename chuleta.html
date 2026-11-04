@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, noai, noimageai">
+<meta name="googlebot" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Chuleta · Parcial 2025</title>
+<link rel="stylesheet" href="vendor/katex.min.css">
+<style>
+  :root { color-scheme: dark; --ink: #e8ecf5; --muted: #9aa5ba; --accent: #7aa7ff; --ok: #5fd08f; --bad: #ff8a7a; --paper: #14171f; --card: #1d222d; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.6rem; margin: 0.2em 0; }
+  h2 { font-size: 1.2rem; border-bottom: 2px solid var(--accent); padding-bottom: 4px; margin-top: 28px; }
+  h3 { font-size: 1rem; margin: 14px 0 4px; color: var(--accent); }
+  .box { background: var(--card); border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
+  .step { display: grid; grid-template-columns: 26px 1fr; gap: 8px; margin: 6px 0; }
+  .n { background: var(--accent); color: #fff; border-radius: 50%; width: 22px; height: 22px; text-align: center; font-weight: 700; line-height: 22px; font-size: 13px; }
+  .ok { color: var(--ok); font-weight: 600; }
+  .bad { color: var(--bad); font-weight: 600; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .trap { border-left: 4px solid var(--bad); padding-left: 10px; margin: 8px 0; }
+  .katex-display { margin: 6px 0; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 6px 0; font-size: 14px; }
+  th, td { border: 1px solid var(--muted); padding: 4px 6px; text-align: center; }
+  th { background: var(--card); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .toc a { color: var(--accent); }
+  @media print {
+    body { font-size: 11px; }
+    h2 { break-after: avoid; }
+    .box, .step { break-inside: avoid; }
+    main { max-width: none; padding: 0; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Chuleta · Parcial de Càlcul (format 2025)</h1>
+<p class="muted">Tot el que surt a l'examen del 3/11/2025, pas a pas. Interpolació NO inclosa (no es fa a classe). Exemple resolt de cada cosa amb el mateix esquema que el parcial.</p>
+
+<div class="box toc">
+  <b>Índex:</b> <a href="#format">Format</a> · <a href="#test">1. Test</a> · <a href="#p1">2. Problema 1 (estudi de funció)</a> · <a href="#p2">3. Problema 2 (Taylor + fita)</a> · <a href="#errors">Errors que costen punts</a>
+</div>
+
+<h2 id="format">Format i què cal fer</h2>
+<div class="box">
+  <p><b>Test (4 punts):</b> 5 opcions, +0.8 si encertes, −0.2 si falles, 0 en blanc. (Sense interpolació, els de la chuleta són 4 preguntes.)</p>
+  <p><b>Problema 1 (3 punts):</b> estudi complet de $f(x)=\dfrac{x^2+c}{x-d}$: domini, asímptotes, creixement, extrems, convexitat, esbós i extrems absoluts en un interval.</p>
+  <p><b>Problema 2 (3 punts):</b> polinomi de Taylor de $\dfrac{e^x-e^{-x}}{2}$ (o amb cosh) i fita de l'error.</p>
+  <p class="trap"><b>Clau:</b> el 2025 deia «no es consideraran vàlides respostes sense justificació». Escriu sempre el pas i la raó: «per Bolzano», «per Weierstrass», «$f'$ canvia de signe», etc.</p>
+</div>
+
+<h2 id="test">1. Test: les 4 preguntes-tipus</h2>
+
+<h3>1a. Continuïtat amb un paràmetre</h3>
+<div class="box">
+  <p>Exemple: $f(x)=\dfrac{(\sin x^2)^2}{x^4}$ per $x\neq0$ i $f(0)=k$. Perquè sigui contínua, cal $k=\lim_{x\to0}f(x)$.</p>
+  <div class="step"><span class="n">1</span><span>Equivalents: $\sin u\sim u$ quan $u\to0$. Aquí $\sin x^2\sim x^2$.</span></div>
+  <div class="step"><span class="n">2</span><span>$\lim_{x\to0}\dfrac{(\sin x^2)^2}{x^4}=\lim\dfrac{(x^2)^2}{x^4}=1$. Per tant $k=1$.</span></div>
+  <p class="muted">Amb $\sin(ax^2)$: el límit és $a^2$ (perquè $(\sin ax^2)^2\sim a^2x^4$).</p>
+</div>
+
+<h3>1b. Punt d'inflexió d'una logística</h3>
+<div class="box">
+  <p>$f(x)=\dfrac{L}{1+e^{-k(x-x_0)}}$: el punt d'inflexió és $x=x_0$ i allà $f(x_0)=\dfrac{L}{2}$.</p>
+  <p>Exemple: $f=\dfrac{1000}{1+e^{-3(x-1)}}$ → inflexió a $x=1$, valor $500$.</p>
+  <p class="muted">Truc: no cal derivar. La logística és simètrica respecte del punt d'inflexió.</p>
+</div>
+
+<h3>1c. Fita del residu de Taylor (la més precisa)</h3>
+<div class="box">
+  <p>Residu de Lagrange: $|R_n(c)|=\dfrac{|f^{(n+1)}(\xi)|}{(n+1)!}\,|c|^{n+1}$, amb $\xi$ entre $0$ i $c$.</p>
+  <div class="step"><span class="n">1</span><span>Per a $e^x$: $|f^{(n+1)}(\xi)|=e^\xi\le e^{c}\lt e\lt 3$ (si $c>0$). Llavors $M=3$.</span></div>
+  <div class="step"><span class="n">2</span><span>Fita: $|R_n(c)|\le\dfrac{3\,c^{n+1}}{(n+1)!}=B$.</span></div>
+  <div class="step"><span class="n">3</span><span>La fita més precisa és la potència $10^{-q}$ més petita que encara és més gran que $B$. Mira la de l'examen: si $B\approx1.25\cdot10^{-5}$, la resposta és $\lt10^{-4}$ (i NO $\lt10^{-5}$, perquè $1.25\cdot10^{-5}>10^{-5}$).</span></div>
+  <p class="trap">Cada pas de $n$ divideix per $n+1$: prova-ho amb $n=3,4,5$ i mira quina potència de 10 cau.</p>
+</div>
+
+<h3>1d. Límit amb paràmetres</h3>
+<div class="box">
+  <p>$\displaystyle\lim_{x\to0}\dfrac{a(1-\cos bx)}{x^2}$. Usa $1-\cos u\sim\dfrac{u^2}{2}$:</p>
+  <p>$\dfrac{a(1-\cos bx)}{x^2}\sim\dfrac{a\,b^2x^2}{2\,x^2}=\dfrac{ab^2}{2}$.</p>
+  <p class="muted">Alternativa: L'Hôpital dues vegades (cada cop derivant numerador i denominador per separat). Si segueix sortint $\frac00$, torna a derivar.</p>
+</div>
+
+<h3>Truc per als tests</h3>
+<div class="box">
+  <p>Si no sabries la pregunta, <b>substitueix els punts o els valors de cada opció</b> dins l'enunciat i descarta. Amb $+0.8/-0.2$, si n'elimines dues, val la pena arriscar.</p>
+</div>
+
+<h2 id="p1">2. Problema 1: estudi de $f(x)=\dfrac{x^2+c}{x-d}$</h2>
+
+<div class="box">
+  <p><b>Truc de la divisió (tot surt d'aquí):</b> escriu $x^2+c=(x-d)(x+d)+K^2$ amb $K^2=c+d^2$. Llavors:</p>
+  $$f(x)=x+d+\frac{K^2}{x-d}$$
+  <p class="muted">Exemple del parcial: $f=\dfrac{x^2+3}{x-1}$ → $d=1$, $K^2=3+1=4$, $K=2$, i $f=x+1+\dfrac{4}{x-1}$.</p>
+</div>
+
+<h3>Pas 1 · Domini</h3>
+<div class="box">
+  <p>Domini $=\mathbb{R}\setminus\{d\}$ (el denominador no pot ser 0).</p>
+</div>
+
+<h3>Pas 2 · Asímptotes</h3>
+<div class="box">
+  <div class="step"><span class="n">V</span><span><b>Vertical</b> $x=d$: el terme $\dfrac{K^2}{x-d}$ tendeix a $\pm\infty$. Mira els límits laterals: $\lim_{x\to d^-}$ i $\lim_{x\to d^+}$.</span></div>
+  <div class="step"><span class="n">O</span><span><b>Obliqua</b> $y=mx+n$: com que $f=x+d+\dots$ i $\dfrac{K^2}{x-d}\to0$, surt $m=1$, $n=d$. Llavors $y=x+d$.</span></div>
+  <div class="step"><span class="n">H</span><span><b>Horitzontal</b>: no n'hi ha (perquè $f\to\pm\infty$ quan $x\to\pm\infty$). Si hi ha obliqua, no pot haver-hi horitzontal.</span></div>
+  <p class="muted">Per comprovar $m$: $m=\lim f(x)/x=1$. Per $n$: $n=\lim(f(x)-x)=d$.</p>
+</div>
+
+<h3>Pas 3 · Creixement i extrems relatius</h3>
+<div class="box">
+  <div class="step"><span class="n">1</span><span>$f'(x)=1-\dfrac{K^2}{(x-d)^2}=\dfrac{(x-d)^2-K^2}{(x-d)^2}=\dfrac{(x-d-K)(x-d+K)}{(x-d)^2}$.</span></div>
+  <div class="step"><span class="n">2</span><span>Punts crítics: $f'=0\Rightarrow x=d-K$ i $x=d+K$. Més el punt $x=d$ (no és del domini).</span></div>
+  <div class="step"><span class="n">3</span><span>Taula de signes (el denominador és sempre positiu): signe de $f'$ = signe de $(x-d-K)(x-d+K)$.</span></div>
+</div>
+<div class="box">
+  <table>
+    <tr><th></th><th>$(-\infty,\ d-K)$</th><th>$(d-K,\ d)$</th><th>$(d,\ d+K)$</th><th>$(d+K,\ \infty)$</th></tr>
+    <tr><td>$f'$</td><td class="ok">+</td><td class="bad">−</td><td class="bad">−</td><td class="ok">+</td></tr>
+    <tr><td>$f$</td><td>↗</td><td>↘</td><td>↘</td><td>↗</td></tr>
+  </table>
+  <p><b>Màxim relatiu</b> a $x=d-K$ amb $f=2d-2K$. <b>Mínim relatiu</b> a $x=d+K$ amb $f=2d+2K$.</p>
+  <p class="muted">Exemple: $d=1,K=2$ → màxim a $x=-1$, $f=-2$; mínim a $x=3$, $f=6$. ✓ (És el de 2025.)</p>
+</div>
+
+<h3>Pas 4 · Concavitat i convexitat</h3>
+<div class="box">
+  <p>$f''(x)=\dfrac{2K^2}{(x-d)^3}$. El numerador és positiu, així que el signe el marca $(x-d)^3$:</p>
+  <ul>
+    <li>$x&gt;d$: $f''&gt;0$ → <b>convexa</b> ($\cup$).</li>
+    <li>$x&lt;d$: $f''&lt;0$ → <b>còncava</b> ($\cap$).</li>
+    <li>No hi ha punts d'inflexió (perquè $x=d$ no és del domini).</li>
+  </ul>
+</div>
+
+<h3>Pas 5 · Extrems absoluts en $[a,b]$ (Weierstrass)</h3>
+<div class="box">
+  <div class="step"><span class="n">1</span><span>Comprova que $f$ és contínua a $[a,b]$: l'asímptota $x=d$ no pot ser dins de l'interval.</span></div>
+  <div class="step"><span class="n">2</span><span>Candidats: els dos extrems $a$, $b$ i els punts crítics <b>dins</b> l'interval.</span></div>
+  <div class="step"><span class="n">3</span><span>Avalua $f$ a tots i compara. El més gran és el màxim absolut, el més petit el mínim absolut.</span></div>
+  <p class="muted">Exemple 2025: $[-2,0]$ → $f(-2)=-\frac73$, $f(-1)=-2$, $f(0)=-3$ → màxim absolut $-2$, mínim absolut $-3$.</p>
+  <p class="trap">Per dir «hi ha màxim absolut» has de citar Weierstrass: $f$ contínua en un tancat i acotat.</p>
+</div>
+
+<h3>Pas 6 · Esbós</h3>
+<div class="box">
+  <p>Dibuixa: asímptota vertical $x=d$, asímptota obliqua $y=x+d$, els dos extrems, el tall amb l'eix $Y$ ($f(0)$) i, si cal, amb l'eix $X$ ($f(x)=0$, és a dir $x^2+c=0$). Llavors ajusta la concavitat a cada costat de l'asímptota vertical.</p>
+</div>
+
+<h2 id="p2">3. Problema 2: Taylor de $\dfrac{e^x-e^{-x}}{2}$ i fita de l'error</h2>
+
+<h3>Part (a): polinomi de Taylor de grau $n$ en $a=0$</h3>
+<div class="box">
+  <p>$f=\sinh x$. Les derivades alternen entre $\sinh$ i $\cosh$:</p>
+  <table>
+    <tr><th>$k$</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+    <tr><td>$f^{(k)}(0)$</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+  </table>
+  <p>Només els termes <b>senars</b> són no nuls: $P_7(x)=x+\dfrac{x^3}{3!}+\dfrac{x^5}{5!}+\dfrac{x^7}{7!}$.</p>
+  <p class="muted">Recorda: $P_n(x)=\displaystyle\sum_{k=0}^{n}\frac{f^{(k)}(0)}{k!}x^k$. Per a $\cosh$, els parells en comptes dels senars.</p>
+</div>
+
+<h3>Part (b): fita de l'error a $x=1$</h3>
+<div class="box">
+  <div class="step"><span class="n">1</span><span>Calcula el valor aproximat: $P_7(1)=1+\dfrac16+\dfrac1{120}+\dfrac1{5040}\approx1.175198$.</span></div>
+  <div class="step"><span class="n">2</span><span>Residu: $R_7(1)=\dfrac{f^{(8)}(\xi)}{8!}\cdot1^8$, amb $0\lt\xi\lt1$. Com que $f^{(8)}=\sinh$ (és parell), $|R_7(1)|=\dfrac{\sinh\xi}{8!}$.</span></div>
+  <div class="step"><span class="n">3</span><span>$\sinh$ és creixent, així que $\sinh\xi\lt\sinh1=\dfrac{e-e^{-1}}{2}\lt\dfrac e2\lt\dfrac32$.</span></div>
+  <div class="step"><span class="n">4</span><span>Fita: $|R_7(1)|\lt\dfrac{3/2}{8!}\approx3.7\cdot10^{-5}$.</span></div>
+</div>
+<div class="box">
+  <p><b>Regla general per a cosh/sinh:</b> si $f^{(n+1)}$ és $\cosh$, $M=\cosh1\lt1.6$; si és $\sinh$, $M=\sinh1\lt1.2$ (o $\lt\frac32$ amb $e\lt3$). Llavors $|R_n(1)|\le\dfrac{M}{(n+1)!}$.</p>
+  <p class="muted">Quina? Per a $\sinh$: $f^{(n+1)}$ és $\cosh$ si $n+1$ és senar, i $\sinh$ si $n+1$ és parell. Per a $\cosh$, al revés.</p>
+</div>
+
+<h2 id="errors">Errors que costen punts</h2>
+<div class="box">
+  <ul>
+    <li>Escriure el resultat sense justificació (el parcial ho deixa clar).</li>
+    <li>Confondre asímptota vertical amb «el denominador és 0»: cal mirar que el numerador no s'anul·li (si s'anul·la és un forat).</li>
+    <li>Oblidar la <b>cadena</b> o el signe quan derives $e^{-x}$.</li>
+    <li>Oblidar $\xi$ al residu o no dir entre quins valors està.</li>
+    <li>Donar la fita sense comparar-la amb l'error real (ha de ser ≥ l'error, però no absurdament gran).</li>
+    <li>Extrems absoluts: oblidar un dels extrems de l'interval.</li>
+  </ul>
+</div>
+
+<p class="muted" style="margin-top:24px">Per practicar: pestanya <b>🔥 Exàmens reals</b> → <b>🎲 Examen 2025 autogenerat</b>. Per a cada tema concret: <b>Exercicis</b>.</p>
+
+</main>
+
+<script src="vendor/katex.min.js"></script>
+<script src="vendor/auto-render.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: "$$", right: "$$", display: true },
+          { left: "$", right: "$", display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  });
+</script>
+</body>
+</html>

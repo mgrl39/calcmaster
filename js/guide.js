@@ -29,6 +29,7 @@
     l13: [['l9', 'Les preguntes del final barregen integrals i àrees.'], ['l10', 'També surten EDOs i el model logístic.'], ['l12', 'I EDOs de 2n ordre.']]
   };
 
+  Calc.PREREQ = PREREQ;
   const byId = id => Calc.byId[id];
   const weak = m => { const mm = store.modMastery(m); return mm.att === 0 || (mm.acc != null && mm.acc < 0.6); };
   /** Llesta per passar a la següent: totes les habilitats almenys a Practicant, o la prova de mestria superada. */
@@ -225,15 +226,17 @@
     const d = store.data(), out = {};
     Object.values(Calc.learn.CONCEPTS).forEach(c => {
       const gens = Calc.allGens().filter(g => (g.needs || []).indexOf(c.id) >= 0);
-      let att = 0; const ms = [];
-      gens.forEach(g => { const gd = d.gens[g.key]; if (gd) att += gd.att; const m = store.genMastery(g.key); if (m != null) ms.push(m); });
+      let att = 0; const ms = [], acs = [];
+      gens.forEach(g => { const gd = d.gens[g.key]; if (gd) att += gd.att; const m = store.genMastery(g.key); if (m != null) ms.push(m); const a = store.genAccuracy(g.key); if (a != null) acs.push(a); });
+      const acc = acs.length ? acs.reduce((a, b) => a + b, 0) / acs.length : null;
       const k = Math.min(3, gens.length) || 1;
       const val = ms.sort((a, b) => b - a).slice(0, k).reduce((a, b) => a + b, 0) / k;
-      out[c.id] = { gens, att, val, st: statusOf(att, val) };
+      out[c.id] = { gens, att, val, acc, st: statusOf(att, val, acc) };
     });
     return out;
   }
-  const statusOf = (att, val) => (!att ? 0 : val >= 0.8 ? 3 : val < 0.4 && att >= 3 ? 1 : 2);
+  // «Et costa» = falles sovint (encert recent < 50%), no «encara tens poc rang»
+  const statusOf = (att, val, acc) => (!att ? 0 : val >= 0.8 ? 3 : acc != null && acc < 0.5 && att >= 3 ? 1 : 2);
   const wrapText = (t, max) => {
     const words = String(t).split(' '), lines = [''];
     words.forEach(w => { const L = lines[lines.length - 1]; if ((L + ' ' + w).trim().length > max && L) lines.push(w); else lines[lines.length - 1] = (L + ' ' + w).trim(); });
@@ -294,6 +297,7 @@
       const tl = wrapText(n.title, opt.chars);
       tl.forEach((ln, i) => { const t = svgEl('text', { x: 10, y: (tl.length === 1 ? 24 : 17) + i * 15, class: 'ntxt' }, g); t.textContent = ln; });
       if (n.st === 3) { const t = svgEl('text', { x: W - 20, y: 20, class: 'ncheck' }, g); t.textContent = '✓'; }
+      else if (n.val > 0) { const t = svgEl('text', { x: W - 8, y: H - 15, class: 'npct', 'text-anchor': 'end' }, g); t.textContent = Math.round(n.val * 100) + '%'; }
       svgEl('rect', { x: 10, y: H - 11, width: W - 20, height: 4, rx: 2, class: 'nbar' }, g);
       svgEl('rect', { x: 10, y: H - 11, width: Math.max(0, (W - 20) * Math.min(1, n.val)), height: 4, rx: 2, class: 'nfill' }, g);
       g.addEventListener('click', () => onClick(id));
@@ -347,8 +351,8 @@
       ORDER.forEach(dep);
       const maxD = Math.max(...Object.values(depth));
       const rows = []; for (let k = 0; k <= maxD; k++) rows.push({ label: 'Nivell ' + (k + 1), ids: ORDER.filter(id => depth[id] === k) });
-      drawGraph(host, rows.filter(r => r.ids.length), id => { const m = byId(id), mm = store.modMastery(m); const st = statusOf(mm.att, mm.value); return { title: m.llista.replace(' + Seminari', '') + ' · ' + U.sideName(m), val: mm.value, st, tip: `${m.title} — ${STATUS[st]} (${U.pct(mm.value)}%)` }; }, depsM,
-        id => { location.hash = '#/mod/' + id + '/theory'; }, { w: 230, lw: 80, per: 3, chars: 30, gy: 90 });
+      drawGraph(host, rows.filter(r => r.ids.length), id => { const m = byId(id), mm = store.modMastery(m); const st = statusOf(mm.att, mm.value, mm.acc); return { title: m.llista.replace(' + Seminari', '') + ' · ' + U.sideName(m), val: mm.value, st, tip: `${m.title} — ${STATUS[st]} (${U.pct(mm.value)}%)` }; }, depsM,
+        id => { location.hash = '#/mod/' + id + '/resum'; }, { w: 230, lw: 80, per: 3, chars: 30, gy: 90 });
     }
   }
   Calc.routes.push({ re: /^#\/mapa/, fn: mapaPage });

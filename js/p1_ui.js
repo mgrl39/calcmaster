@@ -253,7 +253,7 @@
       const nd = L ? L.items.filter(it => done[L.id + ':' + it.n]).length : 0;
       return `<div class="card modcard"><div class="row"><span class="chip accent">${LISTNAME[id]}</span>${L ? '<span class="chip warn">' + '★'.repeat(L.stars || 1) + '</span>' : ''}<span class="spacer"></span><span class="pct">${U.pct(mm.value)}%</span></div>
         <h3>${esc(U.sideName(m))}</h3><p>${esc(LISTTOPIC[id])}</p><div class="bar"><i style="width:${U.pct(mm.value)}%"></i></div>
-        <div class="muted" style="font-size:.85rem">${L ? nd + '/' + L.items.length + ' exercicis de la llista fets · ' : ''}${m.gens.length} tipus d'exercici</div>
+        <div class="muted" style="font-size:.85rem">${L ? (Calc.listStats ? (st => st.dom + '/' + st.n + ' exercicis de la llista dominats · ' + st.tried + ' treballats · ')(Calc.listStats(id)) : nd + '/' + L.items.length + ' exercicis de la llista fets · ') : ''}${m.gens.length} tipus d'exercici</div>
         <div class="row"><a class="btn sm primary" href="#/mod/${id}/list">📋 Llista</a><a class="btn sm" href="#/mod/${id}/theory">📖 Teoria</a><a class="btn sm" href="#/mod/${id}/practice">✍️ Practicar</a><a class="btn sm" href="#/mod/${id}/test">✅ Test</a><a class="btn sm" href="#/mod/${id}/exams">🎓 Examen</a></div></div>`;
     };
     const S = has('TOPIC_RANKING') ? TOPIC_RANKING.filter(t => t.tier === 'S') : [];

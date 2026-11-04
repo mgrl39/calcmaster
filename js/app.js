@@ -160,16 +160,16 @@
   function renderSide(active) {
     const errs = store.data().errors.length;
     const item = (href, icon, text, extra, id) => `<a class="item ${active === id ? 'active' : ''}" href="${href}"><span class="num">${icon}</span><span class="t">${text}</span>${extra || ''}</a>`;
-    const modItem = m => { const mm = store.modMastery(m); return `<a class="item ${active === m.id ? 'active' : ''}" href="#/mod/${m.id}/practice"><span class="num">${esc(m.num)}</span><span class="t">${esc(sideName(m))}</span>${ring(mm.value)}</a>`; };
+    const modItem = m => { const mm = store.modMastery(m); return `<a class="item ${active === m.id ? 'active' : ''}" href="#/mod/${m.id}/resum"><span class="num">${esc(m.num)}</span><span class="t">${esc(sideName(m))}</span>${ring(mm.value)}</a>`; };
     let openState = {};
     try { openState = JSON.parse(localStorage.getItem('calcmaster.side') || '{}'); } catch (e) { /* res */ }
     const grp = (id, title, html, closed) => `<details data-g="${id}" ${openState[id] === false || (closed && openState[id] !== true) ? '' : 'open'}><summary>${title}</summary>${html}</details>`;
-    const F = Calc.focusOn(), due = Calc.dueCount ? Calc.dueCount() : 0, xdue = Calc.partsDueCount ? Calc.partsDueCount() : 0;
+    const F = Calc.focusOn(), due = Calc.dueCount ? Calc.dueCount() : 0, xdue = Calc.partsDueCount ? Calc.partsDueCount() : 0, ldue = Calc.listsDueCount ? Calc.listsDueCount() : 0;
     const p1Items = item('#/p1/exams', '🔥', 'Exàmens reals 1r parcial', '', 'p1exams') + item('#/p1/sim', '⏱️', 'Simulacre 1r parcial', '', 'p1sim') + item('#/p1/temes', '📈', 'Què surt al 1r parcial', '', 'p1temes') + item('#/p1', '📘', 'Resum 1r parcial', '', 'p1');
     $('#side').innerHTML =
-      item('#/', '🏠', 'Inici', '', 'home') + item('#/mestria', '🏆', 'Mestria i constància', '', 'mestria') + item('#/curs', '🎓', 'Què estudiem i per què', '', 'curs') + item('#/cami', '🧭', 'Camí recomanat', '', 'cami') + item('#/mapa', '🗺️', 'Mapa del temari', '', 'mapa') + item('#/nivell', '🔎', 'Test de nivell', '', 'nivell') +
-      grp('prac', 'Practicar', item('#/practice', '🎯', 'Pràctica mixta', '', 'practice') + item('#/mix', '🧩', 'Tria llistes i barreja', '', 'mix') + item('#/repas', '🧠', 'Repàs del dia', due ? `<span class="chip accent">${due}</span>` : '', 'repas') + item('#/review', '🔁', 'Repàs d\'errors', errs ? `<span class="chip warn">${errs}</span>` : '', 'review') + item('#/eines', '🧰', 'Eines per integrar', '', 'eines') + item('#/p1/test', '✅', 'Banc de tests', '', 'p1test')) +
-      grp('exam', 'Exàmens (el que compta)', item('#/entrena', '🎓', 'Entrenament d\'exàmens', xdue ? `<span class="chip accent">${xdue}</span>` : '', 'entrena') + item('#/exam', '📝', 'Examen generat', '', 'exam') + item('#/p2', '🔥', 'Exàmens reals 2n parcial', '', 'p2exams') + item('#/p2/temes', '📈', 'Què surt al 2n parcial', '', 'p2temes') + p1Items) +
+      item('#/', '🏠', 'Inici', '', 'home') + item('#/temari', '🗂️', 'El meu temari', '', 'temari') + item('#/guia', '❓', 'Com funciona', '', 'guia') + item('#/mestria', '🏆', 'Mestria i constància', '', 'mestria') + item('#/curs', '🎓', 'Què estudiem i per què', '', 'curs') + item('#/cami', '🧭', 'Camí recomanat', '', 'cami') + item('#/mapa', '🗺️', 'Mapa del temari', '', 'mapa') + item('#/nivell', '🔎', 'Test de nivell', '', 'nivell') +
+      grp('prac', 'Practicar', item('#/llistes', '📋', 'Llistes oficials (exercicis)', ldue ? `<span class="chip accent">${ldue}</span>` : '', 'llistes') + item('#/jocs', '🎮', 'Jocs d\'entrenament', '', 'jocs') + item('#/teoremes', '📜', 'Teoremes (fitxes)', '', 'teoremes') + item('#/practice', '🎯', 'Pràctica mixta', '', 'practice') + item('#/mix', '🧩', 'Tria llistes i barreja', '', 'mix') + item('#/repas', '🧠', 'Repàs del dia', due ? `<span class="chip accent">${due}</span>` : '', 'repas') + item('#/review', '🔁', 'Repàs d\'errors', errs ? `<span class="chip warn">${errs}</span>` : '', 'review') + item('#/eines', '🧰', 'Eines per integrar', '', 'eines') + item('#/p1/test', '✅', 'Banc de tests', '', 'p1test')) +
+      grp('exam', 'Exàmens (el que compta)', item('#/cobertura', '✅', 'Res nou a l\'examen', '', 'cobertura') + item('#/entrena', '🎓', 'Entrenament d\'exàmens', xdue ? `<span class="chip accent">${xdue}</span>` : '', 'entrena') + item('#/p2/sim', '⏱️', 'Simulacre 2n parcial', '', 'p2sim') + item('#/exam', '📝', 'Examen generat', '', 'exam') + item('#/p2', '🔥', 'Exàmens reals 2n parcial', '', 'p2exams') + item('#/p2/temes', '📈', 'Què surt al 2n parcial', '', 'p2temes') + p1Items) +
       (F ? grp('temari', 'Temari 2n parcial (L6–L13)', MODS.filter(m => Calc.FOCUS_IDS.includes(m.id)).map(modItem).join('')) + grp('temari1', 'Base i 1r parcial (també s\'entrena)', MODS.filter(m => !Calc.FOCUS_IDS.includes(m.id)).map(modItem).join(''))
         : grp('temari', 'Temari (cada llista)', MODS.map(modItem).join(''))) +
       grp('consulta', 'Consulta', item('#/formulari', '📐', 'Formulari', '', 'formulari') + item('#/p1/teoria', '📚', 'Apunts generals', '', 'p1teoria') + item('#/p1/guia', '🧠', 'Plantilles i errors típics', '', 'p1guia') + item('#/p1/resolts', '🧾', 'Problemes resolts', '', 'p1resolts') + item('#/grafica', '📈', 'Dibuixa una funció', '', 'grafica') + item('#/p1/chuleta', '📝', 'Xuleta', '', 'p1chuleta') + item('#/recursos', '📎', 'PDFs originals', '', 'recursos')) +
@@ -386,8 +386,16 @@
       let p;
       try { p = Calc.make(gen, seed); } catch (e) { console.error(e); return next(); }
       const v = new QView(p, { meta: metaOf(gen), split: true, about: aboutOf(gen), example: !cfg.noExample });
-      const st = { finished: false };
+      const st = { finished: false, doubt: false };
       current = st;
+      // Confiança: un encert a l'atzar no és domini (no puja el rang)
+      const act = $('.actions', v.el);
+      if (act && !cfg.noConf) {
+        const cf = document.createElement('div'); cf.className = 'conf';
+        const drawConf = () => { cf.innerHTML = `<span class="muted small">Abans de comprovar, com de segur estàs?</span><button type="button" class="btn sm ${st.doubt ? '' : 'primary'}" data-conf="0">✔ Segur</button><button type="button" class="btn sm ${st.doubt ? 'primary' : ''}" data-conf="1">🤔 Dubto / endevino <kbd>D</kbd></button>`; $$('[data-conf]', cf).forEach(b => b.onclick = () => { if (!v.recorded) { st.doubt = b.dataset.conf === '1'; drawConf(); } }); };
+        drawConf(); act.parentNode.insertBefore(cf, act);
+        v.toggleConf = () => { if (!v.recorded) { st.doubt = !st.doubt; drawConf(); } };
+      }
       const check = () => {
         if (v.done) return;
         const a = v.getAnswer();
@@ -396,15 +404,18 @@
         if (g.parseError && !g.ok) { v.feedback('info', 'No entenc el que has escrit (no compta com a error). Revisa que els parèntesis tanquin i el format: <code>x^2</code>, <code>3/4</code>, <code>sqrt(2)</code>, <code>e^(2x)</code>, <code>ln(x)</code>. Mira la vista prèvia sota la casella.'); return; }
         v.attempts++;
         if (g.ok) {
-          const first = v.attempts === 1 && v.hints === 0;
+          const clean = v.attempts === 1 && v.hints === 0, lucky = clean && st.doubt, first = clean && !st.doubt;
           let info = null;
+          if (!v.recorded && clean && store.calib) store.calib(st.doubt, true);
           if (!v.recorded) { info = store.record(gen.key, first, p, first ? 'ok' : 'assist'); v.recorded = true; sess.n++; sess.xp += info.xp; if (first) { sess.ok++; sess.streak++; } else sess.streak = 0; }
           v.mark(true, g.parts); v.lock(); st.finished = true;
           const gain = info && Calc.gainHtml ? Calc.gainHtml(info) : '';
-          v.feedback('ok', (first ? '✅ <b>Correcte!</b> Mira igualment la solució: potser hi ha un camí més curt.' : v.attempts === 1 ? '✅ <b>Correcte</b>, amb pista. Compta com a esforç (+XP), però per pujar de rang l\'has d\'encertar sense ajuda.' : '✅ <b>Correcte</b>, tot i que no a la primera. Aquest tipus tornarà a sortir al repàs perquè el fixis.') + gain);
+          v.feedback('ok', (lucky ? '✅ <b>Correcte</b>, però has dit que <b>dubtaves</b>: compta com a esforç (+XP) i no puja el rang. Un encert a l\'atzar no és domini. Quan surti al repàs i el sàpigues segur, sí que comptarà.' : first ? '✅ <b>Correcte!</b> Mira igualment la solució: potser hi ha un camí més curt.' : v.attempts === 1 ? '✅ <b>Correcte</b>, amb pista. Compta com a esforç (+XP), però per pujar de rang l\'has d\'encertar sense ajuda.' : '✅ <b>Correcte</b>, tot i que no a la primera. Aquest tipus tornarà a sortir al repàs perquè el fixis.') + gain);
           v.showSolution(); finish();
         } else {
           let info = null;
+          const sureWrong = !v.recorded && !st.doubt;
+          if (!v.recorded && store.calib) store.calib(st.doubt, false);
           if (!v.recorded) { info = store.record(gen.key, false, p, 'fail'); v.recorded = true; sess.n++; sess.xp += info.xp; sess.streak = 0; }
           v.mark(false, g.parts);
           if (p.type !== 'mc') { $$('input.ans', v.el).forEach(i => i.classList.remove('good', 'wrong')); if (g.parts) $$('input.ans', v.el).forEach((inp, i) => { inp.classList.add(g.parts[i] ? 'good' : 'wrong'); }); else $$('input.ans', v.el).forEach(inp => inp.classList.add('wrong')); v.el.classList.remove('bad'); }
@@ -413,7 +424,7 @@
           const whyMsg = g.why && Calc.learn ? '<div style="margin-top:6px">' + Calc.learn.WHY[g.why] + '</div>' : '';
           const partsMsg = g.parts && p.type === 'multi' ? `<div class="small" style="margin-top:4px">Bé ${g.parts.filter(Boolean).length} de ${g.parts.length} caselles (les vermelles són les que fallen).</div>` : '';
           const tries = v.attempts === 1 ? 'Torna-ho a provar.' : v.attempts === 2 ? 'Prova amb una 💡 pista o mira l\'📘 exemple.' : 'Si et bloqueges, mira la solució: aprendre de la solució també compta.';
-          v.feedback('bad', (p.type === 'mc' ? '❌ <b>No és aquesta.</b> Mira per què a la solució.' : '❌ <b>Encara no.</b> ' + tries) + whyMsg + partsMsg + (v.attempts >= 2 ? refChips(gen.needs, 'Repassa') : '') + (info && Calc.gainHtml ? Calc.gainHtml(info) : ''));
+          v.feedback('bad', (p.type === 'mc' ? '❌ <b>No és aquesta.</b> Mira per què a la solució.' : '❌ <b>Encara no.</b> ' + tries) + (sureWrong ? '<div class="small" style="margin-top:6px">⚠️ Estaves <b>segur</b> i has fallat: és l\'error més car a l\'examen (no el revisaràs). Mira bé on falla.</div>' : '') + whyMsg + partsMsg + (v.attempts >= 2 ? refChips(gen.needs, 'Repassa') : '') + (info && Calc.gainHtml ? Calc.gainHtml(info) : ''));
           renderTop(); renderSide(cfg.activeId);
           updBar();
         }
@@ -478,7 +489,7 @@
     app.innerHTML = `
       <section class="hero"><h1>CalcMaster</h1>
         <p>Aprèn el temari de Càlcul des de zero: teoria clara, exercicis infinits amb correcció a l'instant, exemples resolts i exàmens reals fins al 2026. Si alguna cosa dona per fet un concepte, el tens enllaçat. Prem <kbd>?</kbd> per veure les dreceres.</p>
-        <div class="row"><a class="btn primary" href="#/practice">🎯 Pràctica mixta</a><a class="btn" href="#/exam">📝 Mode examen</a><a class="btn" href="#/review">🔁 Repàs d'errors${d.errors.length ? ' (' + d.errors.length + ')' : ''}</a><a class="btn" href="#/curs">🎓 Què estudiem i per què</a><a class="btn" href="#/cami">🧭 Camí recomanat</a><a class="btn" href="#/mapa">🗺️ Mapa del temari</a></div></section>
+        <div class="row"><a class="btn primary" href="#/temari">🗂️ El meu temari</a><a class="btn" href="#/guia">❓ Com funciona</a><a class="btn" href="#/practice">🎯 Pràctica mixta</a><a class="btn" href="#/exam">📝 Mode examen</a><a class="btn" href="#/review">🔁 Repàs d'errors${d.errors.length ? ' (' + d.errors.length + ')' : ''}</a><a class="btn" href="#/curs">🎓 Què estudiem i per què</a><a class="btn" href="#/cami">🧭 Camí recomanat</a><a class="btn" href="#/mapa">🗺️ Mapa del temari</a></div></section>
       ${Calc.dashMestria ? Calc.dashMestria() : ''}
       ${focusBar()}
       ${tot < 10 && !Calc.focusOn() ? `<div class="card tipcard" style="margin-top:16px"><b>🔎 No saps per on començar?</b> Fes el <a href="#/nivell">test de nivell</a> (uns 10 minuts): et diu què tens fresc i què convé repassar, des dels fonaments. No cal haver fet res abans.</div>` : ''}
@@ -515,7 +526,7 @@
     app.innerHTML = `<div class="modhead"><div class="crumbs"><a href="#/">Inici</a><span>› Temari › ${esc(m.llista)}</span><span class="chip ${moduleStatus(m).cls}" title="Domini mitjà dels tipus d'exercici">${pct(mm.value)}% · ${mm.covered}/${mm.total} tipus fets</span>${Calc.modChip ? Calc.modChip(m) : ''}<span class="spacer"></span>${prev ? `<a href="#/mod/${prev.id}/${tab}" title="${esc(prev.title)}">← ${esc(prev.llista)}</a>` : ''}${nxt ? `<a href="#/mod/${nxt.id}/${tab}" title="${esc(nxt.title)}">${esc(nxt.llista)} →</a>` : ''}</div>
       <h1>${esc(m.title)}</h1>
       <p class="lead">${esc(m.short)}</p></div>${onSom(m)}${(Calc.tipFor && Calc.tipFor(m)) || ''}
-      <div class="tabs"><a class="${tab === 'theory' ? 'active' : ''}" href="#/mod/${id}/theory">📖 Teoria</a><a class="${tab === 'practice' ? 'active' : ''}" href="#/mod/${id}/practice">✍️ Pràctica</a><a class="${tab === 'test' ? 'active' : ''}" href="#/mod/${id}/test">✅ Test</a>${extra.map(t => `<a class="${tab === t.id ? 'active' : ''}" href="#/mod/${id}/${t.id}">${t.label}</a>`).join('')}</div><div id="tabbody"></div>`;
+      <div class="tabs">${extra.filter(t => t.first).map(t => `<a class="${tab === t.id ? 'active' : ''}" href="#/mod/${id}/${t.id}">${t.label}</a>`).join('')}<a class="${tab === 'theory' ? 'active' : ''}" href="#/mod/${id}/theory">📖 Teoria</a><a class="${tab === 'practice' ? 'active' : ''}" href="#/mod/${id}/practice">✍️ Pràctica</a><a class="${tab === 'test' ? 'active' : ''}" href="#/mod/${id}/test">✅ Test</a>${extra.filter(t => !t.first).map(t => `<a class="${tab === t.id ? 'active' : ''}" href="#/mod/${id}/${t.id}">${t.label}</a>`).join('')}</div><div id="tabbody"></div>`;
     const body = $('#tabbody');
     $$('.onsom, .tipcard', app).forEach(typeset);
     const xt = extra.find(t => t.id === tab);
@@ -531,7 +542,7 @@
     if (!st) return '';
     const b = L.BLOCS[st[0] - 1];
     let open = false;
-    try { open = localStorage.getItem('calcmaster.onsom') === '1'; } catch (e) { /* res */ }
+    try { open = localStorage.getItem('calcmaster.onsom') !== '0'; } catch (e) { /* res */ }
     return `<details class="onsom" ${open ? 'open' : ''} ontoggle="try{localStorage.setItem('calcmaster.onsom',this.open?'1':'0')}catch(e){}"><summary><span class="ob">📍 ${b ? 'Bloc ' + b.n + ' · ' + esc(b.t) : 'Base del curs'}</span><span class="oq">${st[1]}</span><span class="ox">${esc(st[5])}</span></summary>
       <div class="ogrid"><div><b>Ve de</b><p>${st[2]}</p></div><div><b>Porta a</b><p>${st[3]}</p></div><div><b>Per a què serveix</b><p>${st[4]}</p></div></div>
       <div class="small muted">Vegeu <a href="#/curs">què estudiem i per què</a> · <a href="#/mapa">mapa del temari</a></div></details>`;
@@ -819,7 +830,8 @@
     ['H', 'Pista'], ['S', 'Veure solució'], ['E', 'Exemple semblant resolt'], ['N', 'Pregunta següent'],
     ['1 – 6', 'Tria l\'opció d\'un test'],
     ['G  i', 'Inici'], ['G  p', 'Pràctica mixta'], ['G  e', 'Mode examen'], ['G  r', 'Repàs d\'errors'],
-    ['G  c', 'Camí recomanat'], ['G  t', 'Mapa del temari'], ['G  q', 'Què estudiem i per què'], ['G  f', 'Formulari'], ['G  m', 'Mestria i constància'],
+    ['G  c', 'Camí recomanat'], ['G  t', 'Mapa del temari'], ['G  q', 'Què estudiem i per què'], ['G  f', 'Formulari'], ['G  m', 'Mestria i constància'], ['G  j', 'Jocs d\'entrenament'],
+    ['D', 'Marca «dubto»: si l\'encertes a l\'atzar, no puja el rang'],
     ['?', 'Mostra / amaga aquesta ajuda']
   ];
   function showKeys() {
@@ -830,7 +842,7 @@
     document.body.appendChild(o); $('#keysClose').onclick = () => o.remove();
   }
   Calc.showKeys = showKeys;
-  const GO = { i: '#/', p: '#/practice', e: '#/exam', r: '#/review', c: '#/cami', t: '#/mapa', q: '#/curs', f: '#/formulari', m: '#/mestria' };
+  const GO = { i: '#/', p: '#/practice', e: '#/exam', r: '#/review', c: '#/cami', t: '#/mapa', q: '#/curs', f: '#/formulari', m: '#/mestria', j: '#/jocs' };
   let goPending = 0;
   document.addEventListener('keydown', e => {
     if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -848,6 +860,7 @@
     if ((k === 'h' || k === 'H') && !v.done) { v.o.onHint && v.o.onHint(); return; }
     if ((k === 's' || k === 'S') && !v.done) { v.o.onSolution && v.o.onSolution(); return; }
     if ((k === 'e' || k === 'E') && v.o.onExample) { v.o.onExample(); return; }
+    if ((k === 'd' || k === 'D') && v.toggleConf && !v.done) { v.toggleConf(); return; }
     if (/^[1-9]$/.test(k) && v.p.type === 'mc' && !v.done) { const l = $$('.mc label.opt', v.el)[+k - 1]; if (l) { e.preventDefault(); l.click(); const r = l.querySelector('input'); if (r) r.checked = true; v.o.onPick && v.o.onPick(); } return; }
     if (k === 'Enter' && v.p.type === 'mc' && !v.done) { v.o.onCheck && v.o.onCheck(); }
   });

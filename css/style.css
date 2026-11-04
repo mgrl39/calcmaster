@@ -508,3 +508,72 @@ body.nopdf .nopdf-only { display: block; }
 body.nopdf a[href^="recursos/pdf/"] { display: none !important; }
 body.nopdf .resrow { display: none; }
 body.nopdf .pdflist { display: none; }
+
+/* Llistes oficials: les integrals altes no han de fer aparèixer una barra vertical */
+.litem .qtext { max-width: 100%; overflow-y: hidden; padding: 4px 0; }
+
+/* ---- Jocs, confiança i rúbrica ---- */
+.conf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0 4px; }
+.conf kbd { font-size: .7rem; padding: 0 4px; }
+ol.steps { margin: 10px 0; padding-left: 0; list-style: none; }
+ol.steps li { padding: 6px 10px; margin: 4px 0; border-left: 3px solid var(--border); background: var(--panel2); border-radius: 0 8px 8px 0; overflow-x: auto; }
+.gamecard h3 { font-size: 1.1rem; }
+.rubric { display: grid; gap: 6px; margin: 10px 0; }
+.rubrow { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--panel2); cursor: pointer; }
+.rubrow input { margin-top: 4px; flex: none; }
+.rubval { margin-top: 2px; }
+.rubwrap { margin-top: 8px; }
+.rubwrap > summary { cursor: pointer; color: var(--muted); }
+.teocard details.teo > summary { cursor: pointer; color: var(--accent); font-weight: 600; margin: 4px 0 8px; }
+.teocard ul { margin: 4px 0 8px; }
+
+/* ---- Temari, resum de tema, guia i franja de propòsit ---- */
+.purpose { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 8px 12px; margin: -6px 0 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel2); font-size: .86rem; }
+.purpose .pustep { font-weight: 700; color: var(--accent); white-space: nowrap; }
+.purpose .pwhere { white-space: nowrap; }
+.purpose .ptxt { flex: 1 1 260px; }
+.purpose .pwhen { color: var(--muted); }
+.purpose .phelp { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border); font-weight: 700; text-decoration: none; }
+.tgroup { margin-top: 22px; }
+.tghead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 10px; }
+.tghead h2 { margin: 0; }
+.tgpct { font-size: 1.4rem; font-weight: 800; color: var(--accent); }
+.tcard { display: flex; flex-direction: column; gap: 6px; padding: 16px 18px; }
+.tcard.infocus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.tchead { gap: 6px; }
+.ttitle { color: var(--text); line-height: 1.3; }
+.tq { font-size: .85rem; color: var(--muted); }
+.tbig { display: flex; align-items: baseline; gap: 8px; }
+.tpct { font-size: 1.7rem; font-weight: 800; }
+.trow { display: grid; grid-template-columns: 9.5em 1fr auto; align-items: center; gap: 8px; font-size: .82rem; color: var(--text); text-decoration: none; }
+.trow:hover { text-decoration: none; color: var(--accent); }
+.tbar { height: 6px; border-radius: 4px; background: var(--panel3); overflow: hidden; }
+.tbar i { display: block; height: 100%; background: var(--ok); }
+.fchk { display: inline-flex; align-items: center; gap: 4px; font-size: .8rem; color: var(--muted); cursor: pointer; }
+.focusbox { margin-top: 12px; }
+.pctinfo summary { cursor: pointer; }
+.whereis .ogrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 8px; }
+.whereis .ogrid p { margin: 4px 0; }
+.tbl tr.sub td { background: var(--panel2); padding-top: 8px; }
+.cycle { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; margin: 12px 0; }
+.cstep { flex: 1 1 170px; position: relative; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--panel); }
+.cstep h3 { margin: 4px 0; }
+.cnum { position: absolute; top: 10px; right: 12px; color: var(--muted); font-weight: 800; }
+.cico { font-size: 1.6rem; }
+.clinks { display: flex; flex-direction: column; gap: 3px; font-size: .86rem; margin: 6px 0; }
+.carrow { align-self: center; color: var(--muted); font-size: 1.3rem; }
+.hier { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.hier > div:not(.harr) { flex: 1 1 150px; display: flex; flex-direction: column; padding: 10px; border-radius: 10px; background: var(--panel2); }
+.harr { color: var(--muted); font-size: 1.3rem; }
+svg.graph .npct { font-size: 10px; fill: var(--muted); font-weight: 700; }
+@media (max-width: 700px) { .carrow { display: none; } .trow { grid-template-columns: 8em 1fr auto; } }
+@media (max-width: 640px) {
+  .purpose { font-size: .78rem; padding: 6px 10px; gap: 4px 8px; margin-top: 0; }
+  .purpose .pwhen { display: none; }
+  .purpose .ptxt { flex-basis: 100%; }
+  .brand { font-size: 0; gap: 0; }
+  .brand .logo { font-size: 1.15rem; }
+}
+.cycle { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+.cycle .carrow { display: none; }
+.purpose .ptxt { flex: 1 1 200px; }

@@ -47,7 +47,7 @@
       const wr = less ? [outer(strict), inner(!strict), '$(' + (-x2) + ',' + (-x1) + ')$'] : [inner(strict), outer(!strict), '$(' + x2 + ',+\\infty)$'];
       const ax = M.polyTex([b, a]);
       return P.mc(r, 'Resol $|' + ax + '|' + rel + T(c) + '$.', sol, wr.filter(w => w !== sol), [
-        less ? '$|u|' + rel + c + '\\iff -' + c + rel + 'u' + rel + c + '$: <b>un sol interval</b> (a prop del centre).' : '$|u|' + rel + c + '\\iff u' + (strict ? '<' : '\\le') + '-' + c + '$ o $u' + rel + c + '$: <b>dos trossos</b> (lluny del centre).',
+        less ? '$|u|' + rel + c + '\\iff -' + c + rel + ' u ' + rel + c + '$: <b>un sol interval</b> (a prop del centre).' : '$|u|' + rel + c + '\\iff u' + (strict ? '<' : '\\le') + '-' + c + '$ o $u' + rel + c + '$: <b>dos trossos</b> (lluny del centre).',
         '$' + ax + '=\\pm' + c + '$ dona $x=' + x1 + '$ i $x=' + x2 + '$.',
         'Solució: ' + sol]);
     }

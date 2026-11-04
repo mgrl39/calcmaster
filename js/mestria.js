@@ -114,7 +114,8 @@
       dom: allS.dom, domP1: p1S.dom === p1S.n, domP2: p2S.dom === p2S.n, domAll: allS.dom === allS.n, mestre: allS.counts[6],
       cert: Object.keys(d.cert).length, goals: days.filter(x => x.goalHit).length, hours: d.ms / 36e5, rev: days.reduce((a, x) => a + (x.rev || 0), 0),
       exams: d.exams.length, examPass: d.exams.some(e => e.mark >= 5), nivell, activeDays: Object.keys(d.days).length,
-      xtried: Object.keys(d.xparts || {}).length, xdom: Object.values(d.xparts || {}).filter(x => x.best >= 5).length,
+      xtried: Object.keys(d.xparts || {}).filter(k => /^P[12]:/.test(k)).length, xdom: Object.keys(d.xparts || {}).filter(k => /^P[12]:/.test(k) && d.xparts[k].best >= 5).length,
+      ltried: Object.keys(d.xparts || {}).filter(k => /^L:/.test(k)).length, ldom: Object.keys(d.xparts || {}).filter(k => /^L:/.test(k) && d.xparts[k].best >= 5).length,
       xP2all: Calc.examStats ? (x => x.tried === x.n && x.n > 0)(Calc.examStats(p => p.par === 2)) : false
     };
   }
@@ -159,7 +160,10 @@
     ['xp25', '📚', 'Vint-i-cinc apartats', 'Treballa 25 apartats d\'exàmens reals', s => s.xtried >= 25],
     ['xpP2', '🧾', 'Tot el 2n parcial vist', 'Treballa tots els apartats dels exàmens del 2n parcial', s => s.xP2all],
     ['xd1', '🎓', 'Apartat dominat', 'Domina un apartat d\'examen real', s => s.xdom >= 1],
-    ['xd20', '🧑‍🎓', 'Vint apartats dominats', 'Domina 20 apartats d\'exàmens reals', s => s.xdom >= 20]
+    ['xd20', '🧑‍🎓', 'Vint apartats dominats', 'Domina 20 apartats d\'exàmens reals', s => s.xdom >= 20],
+    ['ll10', '📋', 'De la llista al paper', 'Treballa 10 exercicis de les llistes oficials', s => s.ltried >= 10],
+    ['ll50', '🗂️', 'Llistes a fons', 'Treballa 50 exercicis de les llistes oficials', s => s.ltried >= 50],
+    ['lld10', '🏗️', 'Deu exercicis de llista dominats', 'Domina 10 exercicis de les llistes oficials', s => s.ldom >= 10]
   ];
   function checkAch(quiet) {
     const d = D(), s = stats(); let any = false;
@@ -368,10 +372,11 @@
   /* ------------------------------ Repàs del dia ------------------------------ */
   function repasPage(mt, h) {
     renderSide('repas');
-    const due = dueGens(), xd = Calc.partsDueCount ? Calc.partsDueCount() : 0;
+    const due = dueGens(), xd = Calc.partsDueCount ? Calc.partsDueCount() : 0, ld = Calc.listsDueCount ? Calc.listsDueCount() : 0;
     const next = Calc.allGens().map(g => gd(g.key)).filter(g => g.best >= 2 && g.due > Date.now()).sort((a, b) => a.due - b.due)[0];
     app.innerHTML = `<h1>🧠 Repàs del dia</h1><p class="lead">Les habilitats que ja havies après i que toca refrescar abans que s'oblidin. Cada rang té el seu interval: Aprenent 1 dia, Practicant 2, Competent 4, Dominat 8, Mestre 21. Si l'encertes, el repàs següent s'allunya; si falles, torna a sortir aviat.</p>` +
       (xd ? `<div class="card tipcard" style="margin-bottom:12px">🎓 També tens <b>${xd}</b> apartats d'exàmens reals per repassar. <a href="#/entrena">Entrenament d'exàmens →</a></div>` : '') +
+      (ld ? `<div class="card tipcard" style="margin-bottom:12px">📋 I <b>${ld}</b> exercicis de les llistes oficials per repassar. <a href="#/llistes">Llistes oficials →</a></div>` : '') +
       (due.length ? `<div class="card" style="margin-bottom:12px"><b>${due.length}</b> habilitats per repassar: <span class="muted small">${due.slice(0, 12).map(g => esc(g.title)).join(' · ')}${due.length > 12 ? ' …' : ''}</span></div><div id="rbody"></div>`
         : `<div class="card"><h2>🎉 No tens res pendent</h2><p>${next ? 'El pròxim repàs és el ' + new Date(next.due).toLocaleDateString('ca', { weekday: 'long', day: 'numeric', month: 'long' }) + '.' : 'Quan una habilitat arribi a Aprenent, apareixerà aquí quan li toqui.'} Mentrestant, avança amb el temari del 2n parcial.</p><div class="row"><a class="btn primary" href="#/practice">🎯 Pràctica mixta</a><a class="btn" href="#/mestria">🏆 Mestria</a></div></div>`);
     if (due.length) mountPractice($('#rbody'), { gens: due, activeId: 'repas' });

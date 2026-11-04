@@ -78,7 +78,7 @@ $\\dfrac{dy}{g(y)}=f(x)\\,dx\\ \\Rightarrow\\ \\displaystyle\\int\\frac{dy}{g(y)
 
   /* Separables amb condició inicial */
   const sepTemplates = [
-    r => { const a = r.nz(-3, 3), y0 = r.nz(-4, 4); return { ode: 'y\'=' + a + 'y', ic: 'y(0)=' + y0, ans: y0 + '*e^(' + a + 'x)', rhs: (x, y) => a * y, x0: 0, y0, st: ['Separa: $\\frac{dy}{y}=' + a + 'dx$ ⇒ $\\ln|y|=' + a + 'x+C$ ⇒ $y=Ke^{' + a + 'x}$.', '$y(0)=' + y0 + '$ ⇒ $K=' + y0 + '$.'] }; },
+    r => { const a = r.nz(-3, 3), y0 = r.nz(-4, 4); return { ode: 'y\'=' + (a === 1 ? '' : a === -1 ? '-' : a) + 'y', ic: 'y(0)=' + y0, ans: y0 + '*e^(' + a + 'x)', rhs: (x, y) => a * y, x0: 0, y0, st: ['Separa: $\\frac{dy}{y}=' + a + 'dx$ ⇒ $\\ln|y|=' + a + 'x+C$ ⇒ $y=Ke^{' + a + 'x}$.', '$y(0)=' + y0 + '$ ⇒ $K=' + y0 + '$.'] }; },
     r => { const a = r.nz(-2, 3), y0 = r.nz(-3, 3); return { ode: 'y\'=' + (a === 1 ? '' : a === -1 ? '-' : a) + 'x\\,y', ic: 'y(0)=' + y0, ans: y0 + '*e^(' + a + '*x^2/2)', rhs: (x, y) => a * x * y, x0: 0, y0, st: ['$\\frac{dy}y=' + a + 'x\\,dx$ ⇒ $\\ln|y|=\\frac{' + a + 'x^2}2+C$ ⇒ $y=Ke^{' + a + 'x^2/2}$.', '$y(0)=' + y0 + '$ ⇒ $K=' + y0 + '$.'] }; },
     r => { const y0 = r.int(1, 4); return { ode: 'y\'=\\dfrac{x}{y}', ic: 'y(0)=' + y0, ans: 'sqrt(x^2+' + y0 * y0 + ')', rhs: (x, y) => x / y, x0: 0, y0, st: ['$y\\,dy=x\\,dx$ ⇒ $\\frac{y^2}2=\\frac{x^2}2+C$ ⇒ $y^2=x^2+C\'$.', '$y(0)=' + y0 + '$ ⇒ $C\'=' + y0 * y0 + '$ i com $y>0$: $y=\\sqrt{x^2+' + y0 * y0 + '}$.'] }; },
     r => { const a = r.int(1, 3), y0 = r.int(1, 4); return { ode: 'y\'=-' + (a === 1 ? '' : a) + 'y^2', ic: 'y(0)=' + y0, ans: y0 + '/(1+' + a * y0 + '*x)', rhs: (x, y) => -a * y * y, x0: 0, y0, st: ['$\\frac{dy}{y^2}=-' + a + 'dx$ ⇒ $-\\frac1y=-' + a + 'x+C$ ⇒ $y=\\frac{1}{' + a + 'x-C}$.', '$y(0)=' + y0 + '$ ⇒ $-C=\\frac1{' + y0 + '}$ ⇒ $y=\\dfrac{' + y0 + '}{1+' + a * y0 + 'x}$.'] }; },
@@ -129,9 +129,9 @@ $\\dfrac{dy}{g(y)}=f(x)\\,dx\\ \\Rightarrow\\ \\displaystyle\\int\\frac{dy}{g(y)
     id: 'equilibria', title: 'Equilibris i estabilitat', level: 2,
     make(r) {
       const [b, a] = H.sortNum(H.distinct(r, 2, -3, 4));
-      return P.multi('Per a l\'equació $y\'=(' + T(a) + '-y)(y' + H.sg(-b) + ')$ ($a>b$), troba els dos equilibris: l\'<b>estable</b> i l\'<b>inestable</b>.',
+      return P.multi('Per a l\'equació $y\'=(' + T(a) + '-y)(' + H.xm(b, 'y') + ')$, troba els dos equilibris: l\'<b>estable</b> i l\'<b>inestable</b>.',
         [{ label: 'estable $y=$', ans: a }, { label: 'inestable $y=$', ans: b }],
-        ['Equilibris: $F(y)=(' + T(a) + '-y)(y' + H.sg(-b) + ')=0$ ⇒ $y=' + a + '$ i $y=' + b + '$.', 'Per a $' + b + '<y<' + a + '$: $F>0$ ⇒ $y$ creix cap a $' + a + '$. Per a $y>' + a + '$: $F<0$ ⇒ baixa cap a $' + a + '$. Per a $y<' + b + '$: $F<0$ ⇒ s\'allunya de $' + b + '$.', 'Estable: $' + a + '$. Inestable: $' + b + '$.']);
+        ['Equilibris: $F(y)=(' + T(a) + '-y)(' + H.xm(b, 'y') + ')=0$ ⇒ $y=' + a + '$ i $y=' + b + '$.', 'Per a $' + b + '<y<' + a + '$: $F>0$ ⇒ $y$ creix cap a $' + a + '$. Per a $y>' + a + '$: $F<0$ ⇒ baixa cap a $' + a + '$. Per a $y<' + b + '$: $F<0$ ⇒ s\'allunya de $' + b + '$.', 'Estable: $' + a + '$. Inestable: $' + b + '$.']);
     }
   });
 

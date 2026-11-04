@@ -118,7 +118,7 @@
     return [[g.pts || 0, RANK_PTS[r], 'punts'], [g.days || 0, RANK_DAYS[r], 'dies'], [g.revs || 0, RANK_REVS[r], 'repassos']].filter(x => x[1] > 0).map(([have, need, label]) => ({ have, need, label, done: have >= need }));
   };
   const dayStr = dt => { dt = dt || new Date(); return dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0') + '-' + String(dt.getDate()).padStart(2, '0'); };
-  Calc.RANKS = RANKS; Calc.RANK_PTS = RANK_PTS; Calc.RANK_DAYS = RANK_DAYS; Calc.RANK_REVS = RANK_REVS; Calc.rankOf = rankOf; Calc.rankOfG = rankOfG; Calc.nextReq = nextReq; Calc.dayStr = dayStr;
+  Calc.RANKS = RANKS; Calc.RANK_VAL = RANK_VAL; Calc.RANK_PTS = RANK_PTS; Calc.RANK_DAYS = RANK_DAYS; Calc.RANK_REVS = RANK_REVS; Calc.rankOf = rankOf; Calc.rankOfG = rankOfG; Calc.nextReq = nextReq; Calc.dayStr = dayStr;
 
   const XP_PTS = [0, 1, 2, 3, 4, 6, 9], XP_DAYS = [0, 0, 0, 2, 3, 4, 6], XP_REVIEW = [1, 1, 2, 4, 7, 14, 30];
   Calc.XP_PTS = XP_PTS; Calc.XP_DAYS = XP_DAYS;

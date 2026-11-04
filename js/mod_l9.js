@@ -124,8 +124,8 @@
       const f = [r.int(1, 5), r.int(-2, 2), 1]; // t^2 + b t + c0
       const g = [0, 0, k]; // k x^2
       const val = M.polyEval(f, k * a * a) * 2 * k * a;
-      return P.num('Si $F(x)=\\displaystyle\\int_1^{' + k + 'x^2}(' + M.polyTex(f, 't') + ')\\,dt$, calcula $F\'(' + a + ')$.', val,
-        ['TFC + cadena: $F\'(x)=f(g(x))g\'(x)$ amb $g(x)=' + k + 'x^2$, $g\'(x)=' + 2 * k + 'x$.', '$F\'(' + a + ')=f(' + k * a * a + ')\\cdot' + 2 * k * a + '=' + T(M.polyEval(f, k * a * a)) + '\\cdot' + 2 * k * a + '=' + T(val) + '$.']);
+      return P.num('Si $F(x)=\\displaystyle\\int_1^{' + (k === 1 ? '' : k) + 'x^2}(' + M.polyTex(f, 't') + ')\\,dt$, calcula $F\'(' + a + ')$.', val,
+        ['TFC + cadena: $F\'(x)=f(g(x))g\'(x)$ amb $g(x)=' + (k === 1 ? '' : k) + 'x^2$, $g\'(x)=' + 2 * k + 'x$.', '$F\'(' + a + ')=f(' + k * a * a + ')\\cdot' + 2 * k * a + '=' + T(M.polyEval(f, k * a * a)) + '\\cdot' + 2 * k * a + '=' + T(val) + '$.']);
     }
   });
 
@@ -134,9 +134,9 @@
     make(r) {
       const [p, q] = H.sortNum(H.distinct(r, 2, -3, 4));
       const f = M.polyMul([-p, 1], [-q, 1]);
-      return P.multi('Sigui $F(x)=\\displaystyle\\int_0^x(t^2' + H.sg(-(p + q)) + 't' + H.sg(p * q) + ')\\,dt$. Troba els punts crítics de $F$: l\'abscissa del màxim local i la del mínim local.',
+      return P.multi('Sigui $F(x)=\\displaystyle\\int_0^x(' + M.polyTex([p * q, -(p + q), 1], 't') + ')\\,dt$. Troba els punts crítics de $F$: l\'abscissa del màxim local i la del mínim local.',
         [{ label: '$x_{\\max}=$', ans: p }, { label: '$x_{\\min}=$', ans: q }],
-        ['$F\'(x)=f(x)=x^2' + H.sg(-(p + q)) + 'x' + H.sg(p * q) + '=(' + H.xm(p) + ')(' + H.xm(q) + ')$ (TFC).', '$F\'=0$ ⇒ $x=' + p + '$ i $x=' + q + '$. Signe de $F\'$: $+,-,+$ ⇒ màxim en $' + p + '$ i mínim en $' + q + '$.']);
+        ['$F\'(x)=f(x)=' + M.polyTex([p * q, -(p + q), 1]) + '=(' + H.xm(p) + ')(' + H.xm(q) + ')$ (TFC).', '$F\'=0$ ⇒ $x=' + p + '$ i $x=' + q + '$. Signe de $F\'$: $+,-,+$ ⇒ màxim en $' + p + '$ i mínim en $' + q + '$.']);
     }
   });
 

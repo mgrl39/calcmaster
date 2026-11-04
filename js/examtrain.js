@@ -51,19 +51,48 @@
   };
   const dueTxt = x => { if (!x) return ''; const dd = Math.ceil((x.due - Date.now()) / 864e5); return dd <= 0 ? '<span class="chip warn">toca repàs</span>' : `<span class="muted small">repàs en ${dd} d</span>`; };
 
+  /* Cada apartat del 2n parcial → el tipus d'exercici (generador) que l'entrena: així en pots fer de semblants sense fi. */
+  const EXGEN = {
+    'P2:sol:t0': 'l9.leibniz_adv', 'P2:sol:t1': 'l12.guess_adv', 'P2:sol:0:0': 'l10.growth', 'P2:sol:0:1': 'l9.area_between', 'P2:sol:0:2': 'l12.from_solutions',
+    'P2:sol:1:0': 'l8.int_mixed', 'P2:sol:1:1': 'l7.trigint', 'P2:sol:1:2': 'l9.area_param', 'P2:sol:2:0': 'l10.ode_subst', 'P2:sol:2:1': 'l10.logistic',
+    'P2:2025:t0': 'l8.int_cubic', 'P2:2025:t1': 'l13.ivp_exist', 'P2:2025:0:0': 'l10.logistic', 'P2:2025:0:1': 'l9.leibniz', 'P2:2025:0:2': 'l13.area_expr',
+    'P2:2025:1:0': 'l10.sep_more', 'P2:2025:1:1': 'l11.lin_exam', 'P2:2025:1:2': 'l12.particular', 'P2:2025:2:0': 'l8.int_dbl_simple', 'P2:2025:2:1': 'l9.volume_adv',
+    'P2:R2024:0:0': 'l4.lhop_diff', 'P2:R2024:0:1': 'l0.p1_expQuadratic', 'P2:R2024:1:0': 'l4.p1_functionStudy', 'P2:R2024:1:1': 'l4.lhop_00',
+    'P2:R2024:2:0': 'l7.trigsub', 'P2:R2024:2:1': 'l8.int_mixed', 'P2:R2024:3:0': 'l10.growth', 'P2:R2024:3:1': 'l11.lin_exam',
+    'P2:2024:0:0': 'l9.leibniz', 'P2:2024:0:1': 'l9.area_parts', 'P2:2024:0:2': 'l8.int_mixed', 'P2:2024:1:0': 'l7.subst', 'P2:2024:1:1': 'l9.volume_adv',
+    'P2:2024:1:2': 'l10.growth_lim', 'P2:2024:2:0': 'l11.lin_exam', 'P2:2024:2:1': 'l12.roots', 'P2:2024:2:2': 'l12.particular',
+    'P2:2023:0:0': 'l9.leibniz_adv', 'P2:2023:0:1': 'l8.int_mixed', 'P2:2023:0:2': 'l9.area_parts', 'P2:2023:1:0': 'l10.growth', 'P2:2023:1:1': 'l11.lin_exam', 'P2:2023:1:2': 'l12.ivp_nh'
+  };
+  Calc.EXGEN = EXGEN;
+  /** Enllaç «fes-ne de semblants» cap a un generador ('l9.leibniz' o bé mòdul + id). */
+  Calc.genLink = (gkey, label) => {
+    const g = gkey && Calc.genByKey(gkey); if (!g) return '';
+    const [mid, gid] = gkey.split('.');
+    return `<div class="row"><span class="muted small">${label || 'Fes-ne de semblants (infinits, amb correcció i mestria):'}</span><a class="btn sm ghost" href="#/mod/${mid}/practice?g=${esc(gid)}">✍️ ${esc(g.title.replace(/\$[^$]*\$/g, m => m))}</a>${Calc.examChip ? Calc.examChip(gkey) : ''}</div>`;
+  };
+
   /** Caixa d'autoavaluació amb rang (es fa servir a les pàgines d'examen i a l'entrenament). */
-  Calc.exBox = function (key, onChange) {
+  Calc.exBox = function (key, onChange, opts) {
+    const what = (opts && opts.what) || 'Apartat d\'examen';
     const b = el('div', 'selfev');
     const draw = () => {
       const x = store.part(key), today = x && x.day === Calc.dayStr(new Date());
-      b.innerHTML = `<div class="row"><span class="muted small">Mestria d'aquest apartat</span>${pill(x ? x.best : 0)}<span class="small">${reqTxt(x)}</span>${dueTxt(x)}</div>
-        <div class="row"><span class="muted small">Com t'ha anat${today ? ' avui' : ''}?</span>${[[2, '✅ Resolt sol'], [1, '🤔 A mitges'], [0, '❌ No me n\'he sortit']].map(([n, t]) => `<button type="button" class="btn sm ${today && x.mark === n ? 'primary' : ''}" data-v="${n}">${t}</button>`).join('')}</div>`;
+      b.innerHTML = `<div class="row"><span class="muted small">Mestria d'aquest ${(opts && opts.what) ? 'exercici' : 'apartat'}</span>${pill(x ? x.best : 0)}<span class="small">${reqTxt(x)}</span>${dueTxt(x)}</div>
+        <div class="row"><span class="muted small">Com t'ha anat${today ? ' avui' : ''}?</span>${[[2, '✅ Resolt sol'], [1, '🤔 A mitges'], [0, '❌ No me n\'he sortit']].map(([n, t]) => `<button type="button" class="btn sm ${today && x.mark === n ? 'primary' : ''}" data-v="${n}">${t}</button>`).join('')}</div>${EXGEN[key] ? Calc.genLink(EXGEN[key]) : ''}`;
       $$('[data-v]', b).forEach(btn => btn.onclick = () => {
         const info = store.markPart(key, +btn.dataset.v);
-        if (info.firstToday && Calc.toast) Calc.toast('⭐', '+' + info.xp + ' XP', info.v === 2 ? 'Apartat d\'examen resolt sol' : 'Apartat d\'examen treballat');
-        if (info.to > info.from && Calc.toast) Calc.toast('▲', 'Apartat d\'examen: ' + RANKS[info.to], '');
+        if (info.firstToday && Calc.toast) Calc.toast('⭐', '+' + info.xp + ' XP', what + (info.v === 2 ? ' resolt sol' : ' treballat'));
+        if (info.to > info.from && Calc.toast) Calc.toast('▲', what + ': ' + RANKS[info.to], '');
         if (Calc.afterPart) Calc.afterPart(info); U.renderTop(); draw(); if (onChange) onChange(info);
       });
+      // Rúbrica: per puntuar-te amb criteri (què és «a mitges»?)
+      if (Calc.rubricBox) {
+        const d = el('details', 'rubwrap', '<summary class="small">🧾 No saps com puntuar-te? Corregeix-te amb la rúbrica</summary>');
+        const rb = Calc.rubricBox({}, false, null), ap = el('button', 'btn sm primary', 'Aplica la nota de la rúbrica');
+        ap.type = 'button';
+        ap.onclick = () => { const m = Calc.rubricMark(rb.state), bt = $(`[data-v="${m}"]`, b); if (bt) bt.click(); };
+        d.appendChild(rb); d.appendChild(ap); b.appendChild(d);
+      }
     };
     draw(); return b;
   };
@@ -125,7 +154,7 @@
     if (cur.mc) {
       const item = K.prepMC(cur.mc, true), blk2 = K.mcBlock(item, '', 'instant');
       $$('.xopt', blk2).forEach((o, oi) => o.addEventListener('click', () => { const xx = store.part(cur.key); if (xx && xx.day === Calc.dayStr(new Date())) return; const info = store.markPart(cur.key, oi === item.correctPos ? 2 : 0); if (Calc.afterPart) Calc.afterPart(info); U.renderTop(); next.hidden = false; }));
-      c.appendChild(blk2);
+      c.appendChild(blk2); if (EXGEN[cur.key]) c.appendChild(el('div', '', Calc.genLink(EXGEN[cur.key])));
     } else {
       c.appendChild(el('div', 'qtext', cur.q));
     }

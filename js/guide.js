@@ -331,6 +331,7 @@
       <div class="mapbar"><div class="seg"><button class="btn sm ${view === 'c' ? 'primary' : ''}" data-v="c">Conceptes (detallat)</button><button class="btn sm ${view === 'm' ? 'primary' : ''}" data-v="m">Llistes (general)</button></div>
         <div class="maplegend">${STATUS.map((s, i) => `<span><i class="lg s${i}"></i>${s}</span>`).join('')}</div>
         <div class="mapprog"><b>${view === 'c' ? doneC + '/' + nC : doneM + '/' + mods.length}</b> ${view === 'c' ? 'conceptes dominats' : 'llistes dominades'}<div class="bar"><i style="width:${Math.round((view === 'c' ? doneC / nC : doneM / mods.length) * 100)}%"></i></div></div></div>
+      <p class="small">🌳 Vols més detall d'un tema? <a href="#/arbre/der">Arbre de derivades</a> · <a href="#/arbre/lim">Límits i L'Hôpital</a> · <a href="#/arbre/ext">Extrems</a> · <a href="#/arbre/int">Integrar</a></p>
       <div class="graphwrap" id="gwrap"></div>
       <p class="muted small">${view === 'c' ? 'Un concepte es posa <b>verd</b> quan tens almenys 3 tipus d\'exercici que el fan servir (o tots, si n\'hi ha menys) amb un domini ≥ 80%. La barreta de sota mostra com hi vas.' : 'Una llista es posa <b>verda</b> quan el domini mitjà dels seus tipus d\'exercici arriba al 80%.'}</p>`;
     $$('[data-v]', app).forEach(b => b.onclick = () => { try { localStorage.setItem('calcmaster.mapview', b.dataset.v); } catch (e) { /* res */ } mapaPage(); });
@@ -360,6 +361,7 @@
     }
   }
   Calc.routes.push({ re: /^#\/mapa/, fn: mapaPage });
+  Calc.graph = { drawGraph, statusOf, STATUS };
 
   /* ------------------------ Què estudiem i per què (guia docent) ------------------------ */
   // Regles de qualificació de la guia docent: M=(P1+P2)/2, NF=0,8·M+0,2·S, recuperació amb màxim 6.

@@ -71,15 +71,17 @@
   const DROP = ['der.x_estudi', 'der.x_opt', 'int.idea'];
 
   const KEY = {};
+  const tag = (p, src) => { if (p && !p.sub) p.sub = src; return p; };
   /** Executa el generador antic com si fos de la clau definitiva (la dificultat segueix el rang d'aquesta). */
   const runAs = (src, key) => function (r) { return src.make.call(Object.assign(Object.create(src), { rankKey: key }), r); };
   /** Afegeix una variant a un tipus d'exercici: la meitat de les vegades surt l'original, l'altra meitat una variant. */
   function addVariant(T, src) {
     if (!T._vars) {
-      const base = T.make; T._vars = [];
-      T.make = function (r) { if (r() < 0.5) return base.call(this, r); const v = T._vars[Math.floor(r() * T._vars.length)]; return v.call(this, r); };
+      const base = T.make; T._vars = []; T._baseSrc = T._baseSrc || T.key;
+      T._pick = r => (r() < 0.5 ? -1 : Math.floor(r() * T._vars.length));
+      T.make = function (r) { const i = T._pick(r); return i < 0 ? tag(base.call(this, r), T._baseSrc) : tag(T._vars[i].fn.call(this, r), T._vars[i].src); };
     }
-    T._vars.push(runAs(src, T.key));
+    T._vars.push({ src: src.key, fn: runAs(src, T.key) });
     T.from = (T.from || []).concat(src.key);
   }
   // 1) tipus nous
@@ -88,7 +90,7 @@
     const src = byKey[k]; if (!src) return;
     const [mod, id, title] = to, key = mod + '.' + id;
     const g = Calc.addGen(mod, { id, title, level: src.level || 2, needs: src.needs, about: src.about, from: [k] });
-    g.make = runAs(src, key);
+    g.make = runAs(src, key); g._baseSrc = k;
     byKey[key] = g; KEY[k] = key;
   });
   // 2) variants
@@ -110,6 +112,52 @@
     Calc.modules.splice(Calc.modules.indexOf(m), 1); delete Calc.byId[id];
   });
   Calc.SKILL_KEY = KEY;
+
+  /* ---- Sub-mestria per «font» (per als arbres d'habilitats) ----
+     Un tipus d'exercici amb variants (p. ex. l2.d_poly: polinomis, potències, arrels, constants…) té UN rang.
+     A més, cada problema porta p.sub = d'on surt, i aquí se'n porta el compte amb les mateixes regles de rang,
+     sense XP extra. Els arbres ho fan servir per dir «Arrels: dominat · Exponents negatius: no començat». */
+  const LOCAL = {};
+  Object.keys(byKey).forEach(k => { LOCAL[k] = byKey[k]; });
+  /** Clau del tipus d'exercici on viu una font (clau antiga o clau d'un tipus). */
+  Calc.srcGen = src => Calc.genByKey(KEY[src] || src) || null;
+  /** Llavor perquè el tipus T generi un exercici de la font src (per practicar un node concret). */
+  Calc.seedFor = (T, src) => {
+    if (!T || !T._vars || !src) return Calc.newSeed();
+    const want = src === T._baseSrc ? -1 : T._vars.findIndex(v => v.src === src);
+    if (want === -1 && src !== T._baseSrc) return Calc.newSeed();
+    for (let i = 0; i < 2000; i++) { const s = Calc.newSeed(); if (T._pick(M.rng(s)) === want) return s; }
+    return Calc.newSeed();
+  };
+  /** Dades de rang d'una font: la sub-mestria si el tipus té variants; si no, el del tipus sencer (és el mateix). */
+  Calc.srcData = src => {
+    const T = Calc.srcGen(src), d = Calc.store.data();
+    if (!T) return null;
+    if (!T._vars) return d.gens[T.key] || null;
+    return (d.sub || {})[src] || null;
+  };
+  const st0 = Calc.store, rec0 = st0.record;
+  st0.record = function (key, ok, p, kind) {
+    const info = rec0.apply(this, arguments);
+    try {
+      const T = Calc.genByKey(key), src = p && p.sub;
+      if (src && T && T._vars) {
+        kind = kind || (ok ? 'ok' : 'fail');
+        const d = st0.data(), now = Date.now(), dk = Calc.dayStr(new Date(now)), sub = d.sub || (d.sub = {});
+        const g = sub[src] || (sub[src] = { att: 0, ok: 0, hist: [], pts: 0, best: 0, due: now, days: 0, revs: 0 });
+        const wasDue = g.best >= 2 && g.due <= now;
+        g.att++; if (kind === 'ok') g.ok++;
+        g.hist.push(kind === 'ok' ? 1 : kind === 'assist' ? 0.5 : 0); if (g.hist.length > 12) g.hist.shift();
+        if (kind === 'ok') g.pts += 1; else if (kind === 'fail') g.pts = Math.max(0, g.pts - 1);
+        if (kind === 'ok' && g.okDay !== dk) { g.days++; g.okDay = dk; }
+        if (wasDue && g.sched && kind === 'ok') g.revs++;
+        g.best = Math.max(g.best, Calc.rankOfG(g));
+        g.due = kind === 'ok' ? now + Calc.REVIEW_DAYS[g.best] * 864e5 : now; g.sched = kind === 'ok'; g.last = now;
+        st0.save();
+      }
+    } catch (e) { /* res */ }
+    return info;
+  };
 
   // 4) progrés desat amb claus antigues → claus definitives (una sola vegada per clau)
   try {

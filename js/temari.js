@@ -172,7 +172,7 @@
         <div class="card stat"><b>${s.ls ? s.ls.dom + '/' + s.ls.n : '—'}</b><span>llista oficial dominada</span></div>
         <div class="card stat"><b>${s.xp.length ? s.xdom + '/' + s.xp.length : '—'}</b><span>apartats d'examen dominats</span></div></div>
       <div class="card next-card" style="margin-top:12px"><div class="row"><div><div class="muted small" style="text-transform:uppercase;letter-spacing:.08em">Què faig ara en aquest tema?</div><h3 style="margin:2px 0">${na.t}</h3><div class="muted small">${na.why}</div></div><span class="spacer"></span><a class="btn primary" href="${na.href}">${na.btn}</a></div></div>
-      ${Calc.appsResum ? Calc.appsResum(m.id) : ''}
+      ${Calc.treeCard ? Calc.treeCard(m.id) : ''}${Calc.appsResum ? Calc.appsResum(m.id) : ''}
       <h2>Tots els tipus d'exercici del tema</h2><p class="muted small">Agrupats pel concepte de teoria que treballen. Encert = últims intents (pesa més el recent). 🔥 = quant surt a l'examen.</p>
       <div class="tablewrap card"><table class="tbl"><tr><th>Tipus d'exercici</th><th>Rang</th><th>Encert</th><th>Intents</th><th>Examen</th></tr>${rows}</table></div>
       ${xp ? `<h2 id="xparts">Apartats d'exàmens reals d'aquest tema</h2><div class="tablewrap card"><table class="tbl"><tr><th>Examen</th><th>Apartat</th><th>Rang</th></tr>${xp}</table></div><p class="small"><a href="#/entrena">🎓 Entrena'ls</a></p>` : ''}`;
@@ -215,6 +215,7 @@
   const STEP = ['', '📖 Entendre', '✍️ Practicar', '📋 Llistes', '🧠 Consolidar', '🎓 Examen', '📚 Consultar', '🏠 Orientar-te'];
   const PURPOSE = [
     [/^#\/?$/, 7, 'Resum del dia i suggeriment de què fer.', 'Quan obres la web.'],
+    [/^#\/arbre/, 2, 'Cada tema partit en peces petites (com l\'arbre de derivades): veus exactament què domines i practiques la peça que falla.', 'Quan vols saber què et falla d\'un tema.'],
     [/^#\/temari/, 7, 'Tot el curs separat per blocs i temes, amb què domines de cada un. Tria el teu focus.', 'Per decidir què estudies.'],
     [/^#\/guia/, 7, 'Explica cada part de la web i què vol dir cada percentatge.', 'Quan dubtes per a què serveix una cosa.'],
     [/^#\/mapa/, 1, 'Com es relacionen els conceptes i els temes (què cal saber abans de què).', 'Quan un tema et costa: mira què hi ha a sota i repassa-ho.'],

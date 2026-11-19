@@ -139,7 +139,7 @@
       try { return K.check(part, $('.ans', partEl(i)).value); } catch (e) { if (!silent) setFb(i, '⚠ ' + esc(e.message) + ' <small>(no compta com a intent)</small>', 'info'); return null; }
     }
     // cada apartat compta per a l'habilitat de CalcMaster que entrena
-    function rec(i, ok, kind) { const part = ex.parts[i]; const k = opts.record && part.skill ? gkey(part.skill) : null; if (k) { try { store.record(k, ok, null, kind); } catch (e) { /* res */ } } }
+    function rec(i, ok, kind) { const part = ex.parts[i]; const k = opts.record && part.skill ? gkey(part.skill) : null; if (k) { try { store.record(k, ok, { sub: 'sem3.' + String(part.skill).replace(/-/g, '_') }, kind); } catch (e) { /* res */ } } }
     function check(i) {
       const part = ex.parts[i], s = st[i];
       if (s.done || finished) return;
@@ -331,7 +331,7 @@
       return `<div class="card"><div class="row"><h3 style="margin:0">${esc(AREAS[a])}</h3><span class="spacer"></span><a class="btn sm primary" href="#/seminari/hab/${a}">▶ Practica l'àrea</a></div>
         <div class="s3skills">${gs.map(g => { const r = store.rank(g.key), acc = store.genAccuracy ? store.genAccuracy(g.key) : null; return `<a class="s3sk" href="#/seminari/hab/g/${g.key}"><span>${g.title} <span class="chip">${esc(Calc.byId[g.mod].llista.replace(' + Seminari', ''))}</span></span><span class="spacer"></span>${acc != null ? `<span class="small ${acc < 0.6 ? 'bad' : 'muted'}">${Math.round(acc * 100)}%</span>` : ''}${pill(r)}</a>`; }).join('')}</div></div>`;
     }).join('');
-    const body = shell('hab', `<p class="lead">Les peces que hi ha dins dels exercicis del seminari, agrupades per àrees. Cada una és un tipus d'exercici <b>de la seva llista</b> (L1–L4 o Fonaments): el rang és el mateix aquí, a la llista, al repàs del dia i als jocs.</p><div class="grid cols2">${rows}</div>`);
+    const body = shell('hab', `<p class="lead">Les peces que hi ha dins dels exercicis del seminari, agrupades per àrees. Cada una és un tipus d'exercici <b>de la seva llista</b> (L1–L4 o Fonaments): el rang és el mateix aquí, a la llista, al repàs del dia i als jocs.</p><div class="card"><b>🌳 En forma d'arbre</b> (què cal saber abans de què, i què domines): <a href="#/arbre/der">📐 Derivades i cadena</a> · <a href="#/arbre/lim">🎯 Límits i L'Hôpital (0/0, ∞/∞, 1^∞…)</a> · <a href="#/arbre/ext">⛰️ Extrems</a></div><div class="grid cols2">${rows}</div>`);
     typeset(body);
   }
 

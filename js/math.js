@@ -115,61 +115,100 @@
   const fn = (name, a) => ({ t: 'fn', name, a });
   M.N = { num, vr, cst, add: (a, b) => bin('add', a, b), sub: (a, b) => bin('sub', a, b), mul: (a, b) => bin('mul', a, b), div: (a, b) => bin('div', a, b), pow: (a, b) => bin('pow', a, b), neg, fn };
 
-  /* ------------------------------ Parser ------------------------------ */
+  /* ------------------------------ Parser ------------------------------
+     Intèrpret de les respostes. Entén l'escriptura «de llibre» (sin(x), 2*x^2) i la «ràpida» dels apunts
+     (sinx, 2xcosx, sin^2x, sen x, arctg x, |x|, 3,5, x², sin⁻¹x, log_2 x…).
+     Ambigüitats: es resolen sempre igual (regles R1–R8 de sota) i, quan una escriptura es pot llegir
+     de dues maneres, M.parse(src, vars, info) deixa un avís a info.warn perquè la vista prèvia el mostri.
+       R1  e^2x, e^-3x, 2^3x  → l'exponent és tot el terme enganxat: e^(2x). Amb espai (e^2 x) → e²·x.
+       R2  sin^2x, sin^2(x), sin²x → (sin x)²;  sin^23x → sin²(3x) (amb avís)            R3  sin^-1 x, sin⁻¹x → arcsin x (també cos, tan)
+       R4  sin2x, sin 2x → sin(2x);  sinx^2 → sin(x²);  sinx/2 → sin(x)/2;  sinxcosx → sin x · cos x
+       R5  1/2x → (1/2)·x  (com Wolfram i les calculadores) ·  avís: «si vols 1/(2x), posa parèntesis»
+       R6  x^1/2 → x/2 (avís: per a √x escriu x^(1/2))      R7  log x = ln x;  log_2 x, log2(x) = log en base 2
+       R8  ln x+1 → ln(x)+1;  √2x → √(2x);  -x^2 → -(x²);  e^x^2 → e^(x²)
+  */
   const FUNCS = {
     sin: 'sin', cos: 'cos', tan: 'tan', asin: 'asin', arcsin: 'asin', acos: 'acos', arccos: 'acos', atan: 'atan', arctan: 'atan', arctg: 'atan', tg: 'tan',
     sinh: 'sinh', cosh: 'cosh', tanh: 'tanh', ln: 'ln', log: 'ln', sqrt: 'sqrt', abs: 'abs', exp: 'exp', cbrt: 'cbrt',
-    // afegides per a Derivar/Integrar (Càlcul dx)
-    sec: 'sec', csc: 'csc', cosec: 'csc', cot: 'cot', cotg: 'cot', asinh: 'asinh', argsinh: 'asinh', argsh: 'asinh', acosh: 'acosh', argcosh: 'acosh', argch: 'acosh', atanh: 'atanh', argtanh: 'atanh', argth: 'atanh'
+    sec: 'sec', csc: 'csc', cosec: 'csc', cot: 'cot', cotg: 'cot', asinh: 'asinh', argsinh: 'asinh', arcsinh: 'asinh', argsh: 'asinh',
+    acosh: 'acosh', argcosh: 'acosh', arccosh: 'acosh', argch: 'acosh', atanh: 'atanh', argtanh: 'atanh', arctanh: 'atanh', argth: 'atanh',
+    // català / castellà i altres maneres d'escriure
+    sen: 'sin', arcsen: 'asin', asen: 'asin', senh: 'sinh', arrel: 'sqrt', raiz: 'sqrt', ctg: 'cot', cotan: 'cot', tgh: 'tanh', arccotg: 'acot', arccot: 'acot', acot: 'acot',
   };
-
+  const INV = { sin: 'asin', cos: 'acos', tan: 'atan', sinh: 'asinh', cosh: 'acosh', tanh: 'atanh' };
+  const FN_KEYS = Object.keys(FUNCS).filter(k => k.length >= 2);
+  const SUP = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-', '⁺': '+', '⁽': '(', '⁾': ')', 'ˣ': 'x' };
   function preprocess(s) {
     return String(s)
-      .replace(/−|–|—/g, '-').replace(/[·×⋅]/g, '*').replace(/÷/g, '/')
-      .replace(/²/g, '^2').replace(/³/g, '^3').replace(/π/g, 'pi').replace(/∞/g, 'inf')
+      .replace(/−|–|—/g, '-').replace(/[·×⋅∙]/g, '*').replace(/÷/g, '/').replace(/[‘’′]/g, "'")
+      .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺⁽⁾ˣ]+/g, m => '^(' + [...m].map(c => SUP[c]).join('') + ')')
+      .replace(/½/g, '(1/2)').replace(/⅓/g, '(1/3)').replace(/¼/g, '(1/4)').replace(/¾/g, '(3/4)')
+      .replace(/π/gi, 'pi').replace(/[+]?\s*(∞|infinit[oy]?|infinity|infty)/gi, 'inf')
+      .replace(/∛\s*\(/g, 'cbrt(').replace(/∛\s*([A-Za-z0-9.]+)/g, 'cbrt($1)')
       .replace(/√\s*\(/g, 'sqrt(').replace(/√\s*([A-Za-z0-9.]+)/g, 'sqrt($1)')
-      .replace(/,/g, '.').replace(/\s+/g, ' ').trim();
+      .replace(/\*\*/g, '^').replace(/[\[{]/g, '(').replace(/[\]}]/g, ')')
+      .replace(/\barc\s+(sin|cos|tan|tg|sen|cotg|cot)/gi, 'arc$1')
+      // R7: logaritmes en base b (log_2 x, log_{10}(x), log2(x))
+      .replace(/log_?\(?\s*(\d+(?:[.,]\d+)?|e)\s*\)?\s*(?=\()/gi, (m, b) => `(1/ln(${b}))*ln`)
+      .replace(/log_\(?\s*(\d+(?:[.,]\d+)?|e)\s*\)?\s*([A-Za-z])/gi, (m, b, x) => `(1/ln(${b}))*ln ${x}`)
+      .replace(/^\s*(?:y'*|f'*\s*\(\s*[a-z]\s*\)|[yfgF]\s*\(\s*[a-z]\s*\)|dy\s*\/\s*d[a-z])\s*=\s*(?=\S)/, '')
+      .replace(/(\d),(\d)/g, '$1.$2').replace(/,/g, '.').replace(/\s+/g, ' ').trim();
   }
 
   function tokenize(s) {
-    const toks = []; let i = 0;
+    const toks = []; let i = 0, sp = false;
+    const push = t => { t.sp = sp; sp = false; toks.push(t); };
     while (i < s.length) {
       const c = s[i];
-      if (c === ' ') { i++; continue; }
+      if (c === ' ') { i++; sp = true; continue; }
       if (/[0-9.]/.test(c)) {
         let j = i; while (j < s.length && /[0-9.]/.test(s[j])) j++;
-        const ex = /^[eE][+-]?[0-9]+/.exec(s.slice(j));
-        if (ex) j += ex[0].length;
+        const ex = /^[eE][+-]?[0-9]+(?![A-Za-z(])/.exec(s.slice(j)); // 1e-3 (però no «2e^x» ni «2ex»)
+        if (ex && !/^[eE]$/.test(ex[0])) j += ex[0].length;
         const txt = s.slice(i, j);
         if ((txt.match(/\./g) || []).length > 1 || txt === '.' || isNaN(parseFloat(txt))) throw new Error('nombre');
-        toks.push({ k: 'num', v: parseFloat(txt) }); i = j; continue;
+        push({ k: 'num', v: parseFloat(txt) }); i = j; continue;
       }
       if (/[A-Za-z]/.test(c)) {
         let j = i; while (j < s.length && /[A-Za-z]/.test(s[j])) j++;
-        // lletres seguides: poden ser funció/constant o producte de variables (xy); es resol al parser
         const word = s.slice(i, j), wl = word.toLowerCase();
-        if (FUNCS[wl] || wl === 'pi' || wl === 'inf' || wl === 'oo') { toks.push({ k: 'id', v: word }); i = j; continue; }
-        // altrament: lletres soltes (producte implícit: "xe", "ab")
+        if (FUNCS[wl] || wl === 'pi' || wl === 'inf' || wl === 'oo') { push({ k: 'id', v: word }); i = j; continue; }
+        // es parteix en funcions conegudes (la més llarga primer) i lletres soltes:
+        // «sinx» → sin x, «xsinx» → x sin x, «sinxcosx» → sin x cos x, «xe» → x e, «pix» → pi x
+        if (word.length > 1) {
+          const segs = []; let k = 0, okSeg = false;
+          while (k < word.length) {
+            let best = null; const rest = wl.slice(k);
+            for (const f of FN_KEYS) if (rest.startsWith(f) && (!best || f.length > best.length)) best = f;
+            if (!best && rest.startsWith('pi')) best = 'pi';
+            if (best) { segs.push(word.slice(k, k + best.length)); k += best.length; okSeg = true; } else { segs.push(word[k]); k++; }
+          }
+          if (okSeg) { segs.forEach(v => push({ k: 'id', v })); i = j; continue; }
+        }
         for (const ch of word) {
           let name = ch;
           if (/^[Cc]$/.test(ch) && j === i + 1) { let m = j; while (m < s.length && /[0-9]/.test(s[m])) m++; name = s.slice(i, m); j = m; }
-          toks.push({ k: 'id', v: name });
+          push({ k: 'id', v: name });
         }
         i = j; continue;
       }
-      if ('+-*/^()|'.includes(c)) { toks.push({ k: 'op', v: c }); i++; continue; }
+      if ("+-*/^()|'".includes(c)) { if (c === "'") throw new Error("caràcter '"); push({ k: 'op', v: c }); i++; continue; }
       throw new Error('caràcter ' + c);
     }
     return toks;
   }
 
-  /** Parseja una expressió. `vars` = llista de noms de variable (p.ex. ['x']). */
-  M.parse = function (src, vars) {
+  /** Parseja una expressió. `vars` = llista de noms de variable (p.ex. ['x']). `info` (opcional) rep info.warn = [avisos]. */
+  M.parse = function (src, vars, info) {
     vars = vars || ['x'];
+    const warn = [], W = m => { if (!warn.includes(m)) warn.push(m); };
     const toks = tokenize(preprocess(src));
     let p = 0;
     const peek = () => toks[p];
-    const eat = v => { if (toks[p] && toks[p].v === v && toks[p].k === 'op') { p++; return true; } return false; };
+    const isOp = (t, v) => t && t.k === 'op' && t.v === v;
+    const eat = v => { if (isOp(toks[p], v)) { p++; return true; } return false; };
+    const isVarTok = t => t && t.k === 'id' && (vars.includes(t.v) || vars.includes(String(t.v).toLowerCase()));
+    const isFnTok = t => t && t.k === 'id' && !!FUNCS[String(t.v).toLowerCase()];
 
     function startsAtom(t) {
       return t && (t.k === 'num' || t.k === 'id' || (t.k === 'op' && (t.v === '(' || t.v === '|')));
@@ -184,14 +223,19 @@
       return a;
     }
     function parseTerm() {
-      let a = parseUnary();
+      let a = parseUnary(), lastDiv = false;
       for (;;) {
         const t = peek();
-        if (eat('*')) a = bin('mul', a, parseUnary());
-        else if (eat('/')) a = bin('div', a, parseUnary());
-        else if (startsAtom(t) && !(t.k === 'op' && t.v === '|' && absOpen)) a = bin('mul', a, parsePowOnly()); // multiplicació implícita
+        if (eat('*')) { a = bin('mul', a, parseUnary()); lastDiv = false; }
+        else if (eat('/')) {
+          const q = peek(); a = bin('div', a, parseUnary()); lastDiv = true;
+          // R5: «1/2x» → (1/2)·x, però s'avisa
+          const n2 = peek(); if (startsAtom(n2) && !n2.sp && !(isOp(n2, '|') && absOpen) && q && !isOp(q, '(')) W('Llegeixo «a/bc» com (a/b)·c: si volies dividir per tot (p. ex. 1/(2x)), posa parèntesis al denominador.');
+        }
+        else if (startsAtom(t) && !(isOp(t, '|') && absOpen)) { a = bin('mul', a, parsePowOnly()); } // multiplicació implícita
         else break;
       }
+      void lastDiv;
       return a;
     }
     function parseUnary() {
@@ -199,13 +243,23 @@
       if (eat('+')) return parseUnary();
       return parsePowOnly();
     }
+    /** Exponent després de «^». `glue`: R1 (e^2x → e^(2x)) si la base és e o un número. */
+    function parseExponent(glue) {
+      let sign = false;
+      if (eat('-')) sign = true; else eat('+');
+      const t0 = peek();
+      let e = parsePowOnly();
+      if (glue && t0 && t0.k === 'num' && isVarTok(peek()) && !peek().sp) e = bin('mul', e, parsePowOnly()); // R1
+      else if (t0 && t0.k === 'num' && isFnTok(peek()) && !peek().sp && glue) W('Llegeixo «e^2sin x» com e²·sin x: si vols tot a l\'exponent, posa parèntesis: e^(2sin x).');
+      // R6: x^1/2 → x/2, però avisa
+      if (t0 && t0.k === 'num' && t0.v === 1 && isOp(peek(), '/') && toks[p + 1] && toks[p + 1].k === 'num' && !peek().sp) W('Llegeixo «x^1/2» com x/2: si volies l\'arrel, escriu x^(1/2) o sqrt(x).');
+      return sign ? neg(e) : e;
+    }
     function parsePowOnly() {
       const base = parseAtom();
       if (eat('^')) {
-        // exponent: admet signe i potència dreta-associativa
-        let e;
-        if (eat('-')) e = neg(parsePowOnly()); else { eat('+'); e = parsePowOnly(); }
-        return bin('pow', base, e);
+        const glue = (base.t === 'const' && base.name === 'e') || base.t === 'num';
+        return bin('pow', base, parseExponent(glue));
       }
       return base;
     }
@@ -214,10 +268,10 @@
       const t = toks[p];
       if (!t) throw new Error('final inesperat');
       if (t.k === 'num') { p++; return num(t.v); }
-      if (t.k === 'op' && t.v === '(') {
+      if (isOp(t, '(')) {
         p++; const e = parseExpr(); if (!eat(')')) throw new Error('parèntesi'); return e;
       }
-      if (t.k === 'op' && t.v === '|') {
+      if (isOp(t, '|')) {
         p++; absOpen++; const e = parseExpr(); absOpen--; if (!eat('|')) throw new Error('barres'); return fn('abs', e);
       }
       if (t.k === 'id') {
@@ -225,22 +279,37 @@
         const w = t.v, wl = w.toLowerCase();
         if (vars.includes(w)) return vr(w);
         if (w === 'e' || w === 'E') return cst('e');
+        if (vars.includes(wl) && w.length === 1) return vr(wl); // X majúscula = x
         if (wl === 'pi') return cst('pi');
         if (wl === 'inf' || wl === 'oo') return cst('inf');
         if (/^[Cc][0-9]*$/.test(w)) return cst(w.toUpperCase());
         if (FUNCS[wl]) {
-          let arg;
-          if (toks[p] && toks[p].k === 'op' && toks[p].v === '(') {
-            p++; arg = parseExpr(); if (!eat(')')) throw new Error('parèntesi');
-            // sin(x)^2
-          } else {
-            arg = parsePowOnly(); // "sin x"
+          let name = FUNCS[wl], arg, pre = null;
+          // R3: sin^-1 x, sin^(-1)(x) → arcsin;   R2: sin^2 x, sin^2(x) → (sin x)^2
+          if (isOp(toks[p], '^')) {
+            const a1 = toks[p + 1], a2 = toks[p + 2], a3 = toks[p + 3], a4 = toks[p + 4];
+            const minusOne = (isOp(a1, '-') && a2 && a2.k === 'num' && a2.v === 1) ? 3 : (isOp(a1, '(') && isOp(a2, '-') && a3 && a3.k === 'num' && a3.v === 1 && isOp(a4, ')')) ? 5 : 0;
+            if (minusOne && INV[name] && toks[p + minusOne]) { p += minusOne; name = INV[name]; }
+            else if (a1 && a1.k === 'num' && Number.isInteger(a1.v) && a1.v >= 20 && a1.v < 100 && String(a1.v)[1] !== '0' && isVarTok(a2) && !a2.sp && !a1.sp) {
+              // R2b: sin^23x → sin²(3x) (els exponents de funcions són d'una xifra)
+              const d = String(a1.v); p++; pre = num(+d[0]); toks[p] = { k: 'num', v: +d.slice(1), sp: false };
+              W('Llegeixo «sin^' + d + 'x» com sin^' + d[0] + '(' + d.slice(1) + 'x): si no és això, posa parèntesis.');
+            }
+            else if (a1 && (a1.k === 'num' || isOp(a1, '(')) && a2) { p++; pre = parseAtom(); }
           }
-          let node = FUNCS[wl] === 'exp' ? bin('pow', cst('e'), arg) : fn(FUNCS[wl], arg);
-          if (eat('^')) { let e; if (eat('-')) e = neg(parsePowOnly()); else e = parsePowOnly(); node = bin('pow', node, e); }
+          if (!toks[p]) throw new Error('falta l\'argument');
+          if (toks[p].k === 'num' && toks[p + 1] && toks[p + 1].k === 'id' && !isFnTok(toks[p + 1]) && !toks[p + 1].sp) {
+            const c = num(toks[p].v); p++; arg = bin('mul', c, parsePowOnly()); // R4: sin2x → sin(2x)
+          } else if (isOp(toks[p], '(')) {
+            p++; arg = parseExpr(); if (!eat(')')) throw new Error('parèntesi');
+          } else {
+            arg = parsePowOnly(); // «sin x», «sin x^2» = sin(x²)
+          }
+          let node = name === 'exp' ? bin('pow', cst('e'), arg) : fn(name, arg);
+          if (pre) node = bin('pow', node, pre);
+          if (eat('^')) node = bin('pow', node, parseExponent(false));
           return node;
         }
-        // paraules de lletres: producte de variables/constants d'una lletra (p.ex. "xe")
         if (w.length > 1) {
           let node = null;
           for (const ch of w) {
@@ -250,14 +319,17 @@
           }
           return node;
         }
-        throw new Error('identificador ' + w);
+        throw new Error('No reconec «' + w + '»');
       }
       throw new Error('inesperat');
     }
     const ast = parseExpr();
-    if (p < toks.length) throw new Error('sobra text');
+    if (p < toks.length) throw new Error(isOp(toks[p], ')') ? 'sobra un parèntesi' : 'sobra text');
+    if (info) info.warn = warn;
     return ast;
   };
+  /** Avisos d'ambigüitat d'una entrada (buit si no n'hi ha o si no s'entén). */
+  M.warnings = function (src, vars) { const info = {}; try { M.parse(src, vars, info); } catch (e) { return []; } return info.warn || []; };
 
   /* ------------------------------ Avaluador ------------------------------ */
   M.evalAst = function evalAst(n, env) {
@@ -291,6 +363,7 @@
           case 'asin': return Math.asin(a); case 'acos': return Math.acos(a); case 'atan': return Math.atan(a);
           case 'sinh': return Math.sinh(a); case 'cosh': return Math.cosh(a); case 'tanh': return Math.tanh(a);
           case 'sec': return 1 / Math.cos(a); case 'csc': return 1 / Math.sin(a); case 'cot': return Math.cos(a) / Math.sin(a);
+          case 'acot': return Math.PI / 2 - Math.atan(a);
           case 'asinh': return Math.asinh(a); case 'acosh': return Math.acosh(a); case 'atanh': return Math.atanh(a);
           case 'ln': return Math.log(Math.abs(a)); // ln|x| (lenient)
           case 'sqrt': return Math.sqrt(a); case 'abs': return Math.abs(a); case 'cbrt': return Math.cbrt(a);
@@ -462,6 +535,7 @@
           case 'asin': o = A.div(num(1), fn('sqrt', A.sub(num(1), A.pow(u, num(2))))); break;
           case 'acos': o = neg(A.div(num(1), fn('sqrt', A.sub(num(1), A.pow(u, num(2)))))); break;
           case 'atan': o = A.div(num(1), A.add(num(1), A.pow(u, num(2)))); break;
+          case 'acot': o = neg(A.div(num(1), A.add(num(1), A.pow(u, num(2))))); break;
           case 'sinh': o = fn('cosh', u); break;
           case 'cosh': o = fn('sinh', u); break;
           case 'tanh': o = A.sub(num(1), A.pow(fn('tanh', u), num(2))); break;
@@ -500,7 +574,7 @@
   M.nthDiff = function (src, n, v) { let a = typeof src === 'string' ? M.parse(src, [v || 'x']) : src; for (let i = 0; i < n; i++) a = M.diff(a, v); return a; };
 
   /* --------------------------------- LaTeX --------------------------------- */
-  const FTEX = { sin: '\\sin', cos: '\\cos', tan: '\\tan', asin: '\\arcsin', acos: '\\arccos', atan: '\\arctan', sinh: '\\sinh', cosh: '\\cosh', tanh: '\\tanh', ln: '\\ln', sec: '\\sec', csc: '\\csc', cot: '\\cot', asinh: '\\operatorname{argsinh}', acosh: '\\operatorname{argcosh}', atanh: '\\operatorname{argtanh}' };
+  const FTEX = { sin: '\\sin', cos: '\\cos', tan: '\\tan', asin: '\\arcsin', acos: '\\arccos', atan: '\\arctan', acot: '\\operatorname{arccot}', sinh: '\\sinh', cosh: '\\cosh', tanh: '\\tanh', ln: '\\ln', sec: '\\sec', csc: '\\csc', cot: '\\cot', asinh: '\\operatorname{argsinh}', acosh: '\\operatorname{argcosh}', atanh: '\\operatorname{argtanh}' };
   function prec(n) {
     switch (n.t) {
       case 'add': case 'sub': return 1;
@@ -610,7 +684,7 @@
   M.checkFn = function (input, ans, opts) {
     opts = opts || {};
     const v = opts.v || 'x';
-    let s = String(input).trim().replace(/\+\s*[cC]\s*$/, '').replace(/^[a-zA-Z]\s*\(\s*[a-z]\s*\)\s*=\s*/, '').replace(/^[yYfFgGhH]\s*=\s*/, '');
+    let s = String(input).trim().replace(/\+\s*(c|k|cte|const)\s*$/i, '').replace(/^[a-zA-Z]\s*\(\s*[a-z]\s*\)\s*=\s*/, '').replace(/^[yYfFgGhH]\s*=\s*/, '');
     if (s === '') return { ok: false, parseError: true };
     let fin;
     try { fin = M.compile(s, [v]); } catch (e) { return { ok: false, parseError: true }; }

@@ -19,6 +19,8 @@
   const byKey = {};
   Calc.modules.forEach(m => m.gens.forEach(g => { byKey[g.key] = g; }));
   (Calc.sem3 && Calc.sem3.gens || []).forEach(g => { g.key = 'sem3.' + g.id; byKey[g.key] = g; });
+  (Calc.sem3 && Calc.sem3.rapid || []).forEach(g => { g.key = 'sem3r.' + g.id; byKey[g.key] = g; });
+  (Calc.sem3 && Calc.sem3.intuit || []).forEach(g => { g.key = 'sem3i.' + g.id; byKey[g.key] = g; });
 
   // clau antiga → clau existent (variant)   o   → [mòdul, id nou, títol] (tipus nou)
   const MAP = {
@@ -66,6 +68,14 @@
     'int.rsim': 'l8.int_simple', 'int.rmul': 'l8.int_repeated', 'int.rquad': 'l8.int_mixed', 'int.rdiv': 'l8.int_improper',
     'int.barrow': 'l9.defint', 'int.cvdef': 'l9.defint', 'int.simet': 'l9.mean', 'int.tfc': 'l9.leibniz', 'int.arees': 'l9.area_between',
     'int.imp1': 'l9.improper', 'int.imp2': 'l9.improper', 'int.impcrit': 'l9.improper',
+    // ---- «⚡ Ràpids» del Seminari 3 (sem3_rapid.js): variants dels tipus de la llista on viu el coneixement ----
+    'sem3r.chain5': 'l2.chain_multi', 'sem3r.chainval': 'l2.d_val', 'sem3r.xk_class': 'l2.d_class', 'sem3r.xk_der': 'l2.d_mixed', 'sem3r.xk_f0': 'l2.d_def',
+    'sem3r.cubic_ext': 'l3.crit_cubic', 'sem3r.cubic_mono': 'l3.monotony', 'sem3r.cubic_abs': 'l3.abs_extrema', 'sem3r.cubic_zeros': 'base.factor',
+    'sem3r.ratinf': 'l1.limit_inf', 'sem3r.ratgen': 'l1.limit_inf',
+    // ---- «🧭 Intuïció» (endevinar amb criteri) ----
+    'sem3i.ch_count': 'l2.chain_layers', 'sem3i.ch_pick': 'l2.chain_multi', 'sem3i.bnd_guess': 'l1.lim_bounded',
+    'sem3i.lim_dom': 'l4.lhop_inf', 'sem3i.lim_1inf': 'l4.lhop_pow', 'sem3i.plaus_pq': 'l1.limit_inf',
+    'sem3i.cubic_shape': 'l3.monotony', 'sem3i.infl_mid': 'l3.inflection', 'sem3i.extr_type': 'l3.crit_test',
   };
   // Sense lloc: barreges de 2–3 exercicis fixos que ja cobreixen altres tipus.
   const DROP = ['der.x_estudi', 'der.x_opt', 'int.idea'];
@@ -79,7 +89,9 @@
     if (!T._vars) {
       const base = T.make; T._vars = []; T._baseSrc = T._baseSrc || T.key;
       T._pick = r => (r() < 0.5 ? -1 : Math.floor(r() * T._vars.length));
-      T.make = function (r) { const i = T._pick(r); return i < 0 ? tag(base.call(this, r), T._baseSrc) : tag(T._vars[i].fn.call(this, r), T._vars[i].src); };
+      // si la variant triada descarta els números (torna null), es reintenta la MATEIXA variant
+      const again = (f, self, r) => { for (let k = 0; k < 40; k++) { const p = f.call(self, r); if (p) return p; } return null; };
+      T.make = function (r) { const i = T._pick(r); return i < 0 ? tag(again(base, this, r), T._baseSrc) : tag(again(T._vars[i].fn, this, r), T._vars[i].src); };
     }
     T._vars.push({ src: src.key, fn: runAs(src, T.key) });
     T.from = (T.from || []).concat(src.key);

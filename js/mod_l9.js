@@ -135,7 +135,7 @@
       const [p, q] = H.sortNum(H.distinct(r, 2, -3, 4));
       const f = M.polyMul([-p, 1], [-q, 1]);
       return P.multi('Sigui $F(x)=\\displaystyle\\int_0^x(' + M.polyTex([p * q, -(p + q), 1], 't') + ')\\,dt$. Troba els punts crítics de $F$: l\'abscissa del màxim local i la del mínim local.',
-        [{ label: '$x_{\\max}=$', ans: p }, { label: '$x_{\\min}=$', ans: q }],
+        [{ label: '$x_{\\text{màx}}=$', ans: p }, { label: '$x_{\\text{mín}}=$', ans: q }],
         ['$F\'(x)=f(x)=' + M.polyTex([p * q, -(p + q), 1]) + '=(' + H.xm(p) + ')(' + H.xm(q) + ')$ (TFC).', '$F\'=0$ ⇒ $x=' + p + '$ i $x=' + q + '$. Signe de $F\'$: $+,-,+$ ⇒ màxim en $' + p + '$ i mínim en $' + q + '$.']);
     }
   });

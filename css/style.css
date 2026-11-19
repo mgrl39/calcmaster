@@ -647,3 +647,21 @@ svg.plot .pp { fill: var(--accent); stroke: var(--panel); stroke-width: 2; }
 svg.plot .pp.pz { fill: var(--muted); } svg.plot .pp.pmax { fill: var(--bad); } svg.plot .pp.pmin { fill: var(--ok); } svg.plot .pp.pinf { fill: var(--warn); }
 .lg { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; }
 .lg.pz { background: var(--muted); } .lg.pmax { background: var(--bad); } .lg.pmin { background: var(--ok); } .lg.pinf { background: var(--warn); }
+
+/* avís d'ambigüitat a la vista prèvia de la resposta */
+.pwarn { color: var(--warn, #d9a441); margin-top: 4px; line-height: 1.35; }
+
+.s3rapcta { display:block; margin-bottom:12px; border-color: var(--accent, #7aa2ff); text-decoration:none; }
+.s3rules { padding-left: 18px; margin: 8px 0 0; }
+.s3rules li { margin-bottom: 8px; }
+
+/* Mòbil: fórmules i taules llargues es desplacen dins la seva caixa, no amplien la pàgina */
+.answers, .mc { min-width: 0; }
+.mc label.opt { min-width: 0; }
+.mc label.opt > span, .mc label.opt > div { min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.katex-display { max-width: 100%; overflow-x: auto; overflow-y: hidden; padding: 2px 0; }
+@media (max-width: 700px) {
+  .card.theory .tbl, .card .tbl { display: block; max-width: 100%; overflow-x: auto; }
+  .row > label { max-width: 100%; white-space: normal; flex-wrap: wrap; }
+}
+select { max-width: 100%; }

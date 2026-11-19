@@ -188,7 +188,7 @@
   function previewTex(str, v) {
     str = String(str).trim();
     if (!str) return '';
-    str = str.replace(/\+\s*[cC]\s*$/, '');
+    str = str.replace(/\+\s*(c|k|cte)\s*$/i, '');
     try { return M.toTex(M.parse(str, [v || 'x'])); } catch (e) { return null; }
   }
   class QView {
@@ -267,6 +267,11 @@
       if (t === '' ) pv.textContent = '';
       else if (t === null) pv.textContent = '… (format no reconegut)';
       else { try { katex.render(t, pv, { throwOnError: false }); } catch (e) { pv.textContent = ''; } }
+      // avís si l'escriptura es pot llegir de dues maneres (p. ex. 1/2x)
+      const ws = t && !(fld && fld.prev) ? M.warnings(String(inp.value).replace(/\+\s*(c|k|cte)\s*$/i, ''), [this.p.v || 'x']) : [];
+      let wv = pv.nextElementSibling && pv.nextElementSibling.classList.contains('pwarn') ? pv.nextElementSibling : null;
+      if (ws.length) { if (!wv) { wv = document.createElement('div'); wv.className = 'pwarn small'; pv.after(wv); } wv.textContent = '⚠️ ' + ws.join(' '); }
+      else if (wv) wv.remove();
     }
     focus() { const i = $('input.ans', this.el); if (i) i.focus({ preventScroll: true }); }
     getAnswer() {
@@ -325,7 +330,7 @@
   }
 
   const helpBlock = `<details class="help"><summary>Com escric les respostes?</summary>
-  Potències <code>x^2</code> · fraccions <code>3/4</code> · arrels <code>sqrt(x)</code> · <code>e^(2x)</code> · <code>ln(x)</code> · <code>sin(x)</code> · <code>pi</code> · <code>abs(x)</code> · infinit <code>inf</code>. El producte implícit funciona (<code>2x</code>, <code>3(x+1)</code>). En primitives pots afegir <code>+C</code> (és opcional). Es corregeix de manera numèrica, així que <b>qualsevol forma equivalent</b> és correcta. Decimals amb coma o punt.</details>`;
+  Potències <code>x^2</code> · fraccions <code>3/4</code> · arrels <code>sqrt(x)</code> · <code>e^(2x)</code> · <code>ln(x)</code> · <code>sin(x)</code> · <code>pi</code> · <code>abs(x)</code> · infinit <code>inf</code>. El producte implícit funciona (<code>2x</code>, <code>3(x+1)</code>). També s'entén l'escriptura ràpida: <code>sinx</code>, <code>2xcosx</code>, <code>sin^2x</code> = (sin x)², <code>sin2x</code> = sin(2x), <code>lnx</code>, <code>sqrtx</code>, <code>|x|</code>, <code>arctg x</code>, <code>sen x</code>. <code>e^2x</code> = e^(2x) (amb espai, <code>e^2 x</code> = e²·x), <code>sin⁻¹x</code> = arcsin x, <code>log_2 x</code> = log en base 2, <code>log x</code> = ln x. Si una cosa es pot llegir de dues maneres (p. ex. <code>1/2x</code>, que és (1/2)·x), la vista prèvia t'ho avisa. Mira-la sempre. En primitives pots afegir <code>+C</code> (és opcional). Es corregeix de manera numèrica, així que <b>qualsevol forma equivalent</b> és correcta. Decimals amb coma o punt.</details>`;
 
   /* ------------------------ Selecció adaptativa d'exercicis ------------------------ */
   let lastKey = null;
@@ -428,7 +433,7 @@
           const whyMsg = g.why && Calc.learn ? '<div style="margin-top:6px">' + Calc.learn.WHY[g.why] + '</div>' : '';
           const partsMsg = g.parts && p.type === 'multi' ? `<div class="small" style="margin-top:4px">Bé ${g.parts.filter(Boolean).length} de ${g.parts.length} caselles (les vermelles són les que fallen).</div>` : '';
           const tries = v.attempts === 1 ? 'Torna-ho a provar.' : v.attempts === 2 ? 'Prova amb una 💡 pista o mira l\'📘 exemple.' : 'Si et bloqueges, mira la solució: aprendre de la solució també compta.';
-          v.feedback('bad', (p.type === 'mc' ? '❌ <b>No és aquesta.</b> Mira per què a la solució.' : '❌ <b>Encara no.</b> ' + tries) + (sureWrong ? '<div class="small" style="margin-top:6px">⚠️ Estaves <b>segur</b> i has fallat: és l\'error més car a l\'examen (no el revisaràs). Mira bé on falla.</div>' : '') + whyMsg + partsMsg + (v.attempts >= 2 ? refChips(gen.needs, 'Repassa') : '') + (info && Calc.gainHtml ? Calc.gainHtml(info) : ''));
+          v.feedback('bad', (p.type === 'mc' ? '❌ <b>No és aquesta.</b> Mira per què a la solució.' : '❌ <b>Encara no.</b> ' + tries) + (sureWrong ? '<div class="small" style="margin-top:6px">⚠️ Estaves <b>segur</b> i has fallat: és l\'error més car a l\'examen (no el revisaràs). Mira bé on falla.</div>' : '') + whyMsg + partsMsg + ((st.doubt || v.attempts >= 2) && Calc.intuHtml ? Calc.intuHtml(gen.key) : '') + (v.attempts >= 2 ? refChips(gen.needs, 'Repassa') : '') + (info && Calc.gainHtml ? Calc.gainHtml(info) : ''));
           renderTop(); renderSide(cfg.activeId);
           updBar();
         }

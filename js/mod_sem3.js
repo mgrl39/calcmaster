@@ -12,17 +12,35 @@
   const S3 = (typeof window !== 'undefined' ? window : globalThis).SEM3;
   if (!S3) return;
   const X = S3.M, P = Calc.P;
+  const CM = (typeof window !== 'undefined' ? window : globalThis).M;
+  const SAMPLE = [-1.93, -1.37, -1.08, -0.83, -0.61, -0.41, -0.27, 0.19, 0.33, 0.52, 0.74, 0.97, 1.21, 1.46, 1.72, 2.03];
+  /** Com equivFn de l'entrenador, però avaluant l'arbre de CalcMaster. */
+  function cmEquiv(ast, trueF, pts) {
+    let ok = 0, bad = 0;
+    const ev = x => CM.evalAst(ast, { x, h: x });
+    for (const x of pts || SAMPLE) {
+      const t = trueF(x);
+      if (!isFinite(t) || Math.abs(t) > 1e7) continue;
+      const u = ev(x);
+      if (!isFinite(u)) { bad++; continue; }
+      if (X.close(u, t, 1e-6)) ok++; else return false;
+    }
+    return ok >= 3 && bad <= ok / 3;
+  }
 
   /* ---------- tipus de resposta (els mateixos que l'app original) ---------- */
   const TYPES = {
+    // Les expressions i els valors es llegeixen amb l'intèrpret de CalcMaster (el mateix de tota la web:
+    // entén sinx, sin^2x, |x|, arctg, sen, 3,5…); si no se'n surt, amb el de l'antic entrenador.
     expr: {
       ph: 'p. ex.  2x*cos(x^2)', keys: ['sin(', 'cos(', 'tan(', 'e^(', 'ln(', 'sqrt(', '^', '/', '()'],
-      parse: s => { const a = X.parse(s); return { ast: a, tex: X.tex(a) }; },
-      prev: p => p.tex, cmp: (p, part) => X.equivFn(p.ast, part.f, part.pts),
+      parse: s => { try { const a = CM.parse(s, ['x', 'h']); return { cm: a, tex: CM.toTex(a) }; } catch (e) { const a = X.parse(s); return { ast: a, tex: X.tex(a) }; } },
+      prev: p => p.tex, cmp: (p, part) => (p.cm ? cmEquiv(p.cm, part.f, part.pts) : X.equivFn(p.ast, part.f, part.pts)),
     },
     value: {
       ph: 'p. ex.  6   ·   3/2   ·   sqrt(3)/3', keys: ['/', 'sqrt(', 'pi', '()'],
-      parse: X.parseValue, prev: p => p.tex, cmp: (p, part) => X.close(p.v, part.v),
+      parse: s => { try { const a = CM.parse(s, []), v = CM.evalAst(a, {}); if (isFinite(v)) return { v, tex: CM.toTex(a) }; } catch (e) { /* l'antic */ } return X.parseValue(s); },
+      prev: p => p.tex, cmp: (p, part) => X.close(p.v, part.v),
     },
     limit: {
       ph: 'p. ex.  3/2   ·   inf   ·   -inf   ·   no existeix', keys: ['inf', '-inf', 'no existeix', '/', 'sqrt(', 'e^('],

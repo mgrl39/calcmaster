@@ -19,19 +19,19 @@
   const DER_EXTRA = {
     D_pow: ['sem3.d_pow'], D_poly: ['l2.d_poly', 'l2.p1_derivBasic', 'l2.d100_0'], D_elem: ['base.dertable', 'sem3.d_elem'],
     D_prod: ['l2.d_product', 'sem3.d_prod'], D_quot: ['l2.d_quotient', 'sem3.d_quot', 'l2.d100_1'], D_pq: ['l2.p1_derivProdQuot'],
-    D_ch1: ['l2.d_chain', 'sem3.c_one', 'l2.p1_derivChain'], D_chsinn: ['sem3.c_powtrig'], D_ch2: ['sem3.c_multi'],
+    D_ch1: ['l2.d_chain', 'sem3.c_one', 'l2.p1_derivChain'], D_chsinn: ['sem3.c_powtrig'], D_ch2: ['sem3.c_multi', 'sem3r.chain5', 'sem3i.ch_pick'],
     D_chexp: ['l2.d100_2'], D_chroot: ['l2.d100_3'], D_chln: ['l2.d100_4'], D_charc: ['l2.d100_5'],
-    D_mix: ['l2.d_mixed', 'sem3.c_mixed', 'l2.p1_derivative'], D_big: ['l2.d100_6', 'l2.d100'],
+    D_mix: ['l2.d_mixed', 'sem3.c_mixed', 'l2.p1_derivative', 'sem3r.xk_der'], D_big: ['l2.d100_6', 'l2.d100'],
     D_logd: ['l2.d_logdiff', 'l2.p1_logDerivative'], D_impl: ['l2.d_implicit', 'l2.p1_implicitDerivative'],
     D_ordre: ['l2.d_second'], D_tang: ['l1.tangent', 'l1.p1_tangent', 'l1.tangent_ext'], D_hip: ['der.x_arghip'],
   };
   const derNodes = (DX ? DX.DNODES : []).map(d => n(d.id, d.n, d.req.slice(), ['der.' + d.id.replace(/^D_/, '').toLowerCase()].concat(DER_EXTRA[d.id] || []), { icon: d.icon, r: d.r, i: d.i, g: d.g }));
   if (derNodes.length) {
-    derNodes.push(n('D_layers', 'Identificar les capes', ['D_elem'], ['sem3.c_layers'], { icon: '🧅', g: 3, i: 'Abans de derivar una composició, digues quines capes té, de fora cap a dins.' }));
+    derNodes.push(n('D_layers', 'Identificar les capes', ['D_elem'], ['sem3.c_layers', 'sem3i.ch_count'], { icon: '🧅', g: 3, i: 'Abans de derivar una composició, digues quines capes té, de fora cap a dins.' }));
     derNodes.find(x => x.id === 'D_ch1').req.push('D_layers');
-    derNodes.push(n('D_val', 'Derivada en un punt', ['D_mix'], ['sem3.d_val'], { icon: "f'(a)", g: 4 }));
-    derNodes.push(n('D_def', 'Derivada per definició', ['D_poly'], ['sem3.l_defder', 'der.x_lim'], { icon: 'lim', g: 4, r: "f'(a)=\\lim_{h\\to0}\\frac{f(a+h)-f(a)}{h}" }));
-    derNodes.push(n('D_class', 'Contínua, derivable, C¹', ['D_def'], ['sem3.l_class'], { icon: 'C¹', g: 4 }));
+    derNodes.push(n('D_val', 'Derivada en un punt', ['D_mix'], ['sem3.d_val', 'sem3r.chainval'], { icon: "f'(a)", g: 4 }));
+    derNodes.push(n('D_def', 'Derivada per definició', ['D_poly'], ['sem3.l_defder', 'der.x_lim', 'sem3r.xk_f0'], { icon: 'lim', g: 4, r: "f'(a)=\\lim_{h\\to0}\\frac{f(a+h)-f(a)}{h}" }));
+    derNodes.push(n('D_class', 'Contínua, derivable, C¹', ['D_def'], ['sem3.l_class', 'sem3r.xk_class'], { icon: 'C¹', g: 4 }));
     derNodes.push(n('D_inv', 'Derivada de la inversa', ['D_arc'], ['der.x_inv'], { icon: 'f⁻¹', g: 4 }));
     derNodes.push(n('D_related', 'Raons de canvi', ['D_impl'], ['l2.d_related', 'l2.related_more'], { icon: 'dV/dt', g: 4 }));
     derNodes.push(n('D_rolle', 'Rolle, TVM i nombre d\'arrels', ['D_mix'], ['l2.tvm', 'l2.p1_rolleTvm', 'l2.roots_count'], { icon: 'TVM', g: 4 }));
@@ -45,20 +45,20 @@
     n('l_lat', 'Límits laterals', ['l_sub'], ['l1.limit_lateral'], { icon: 'a±' }),
     n('l_cont', 'Continuïtat amb paràmetre', ['l_lat'], ['l1.cont_param', 'l1.cont_two', 'l1.p1_continuity'], { icon: 'k' }),
     n('l_bolz', 'Bolzano', ['l_cont'], ['l1.bolzano_mc', 'l1.bolzano_vals', 'l1.p1_bolzano'], { icon: '±→0' }),
-    n('l_bounded', 'Zero per acotada', ['l_sub'], ['sem3.l_bounded'], { icon: '0·acot' }),
+    n('l_bounded', 'Zero per acotada', ['l_sub'], ['sem3.l_bounded', 'sem3i.bnd_guess'], { icon: '0·acot' }),
     n('l_osc', 'Quan no existeix (sin 1/x)', ['l_bounded'], ['sem3.l_osc'], { icon: '∄' }),
-    n('r_deg', 'Graus a +∞', ['l_sub'], ['sem3.r_deg', 'l1.limit_inf'], { icon: '∞/∞' }),
+    n('r_deg', 'Graus a +∞', ['l_sub'], ['sem3.r_deg', 'l1.limit_inf', 'sem3r.ratinf', 'sem3i.plaus_pq'], { icon: '∞/∞' }),
     n('r_neg', 'Cap a −∞', ['r_deg'], ['sem3.r_neg'], { icon: '−∞' }),
-    n('r_general', 'Quocients: cas general', ['r_neg'], ['sem3.r_general', 'sem3.x_limits'], { icon: 'P/Q' }),
+    n('r_general', 'Quocients: cas general', ['r_neg'], ['sem3.r_general', 'sem3.x_limits', 'sem3r.ratgen'], { icon: 'P/Q' }),
     n('r_root', 'Arrels a l\'infinit', ['r_deg'], ['l1.limit_inf_root'], { icon: '√' }),
     n('h_form', 'Quin tipus d\'indeterminació és?', ['l_factor'], ['sem3.h_form'], { icon: '?' }),
     n('h_step', 'Aplicar la regla (un pas)', ['h_form'], ['sem3.h_step'], { icon: "f'/g'", r: "\\lim\\frac fg=\\lim\\frac{f'}{g'}" }),
     n('h_00', 'L\'Hôpital 0/0', ['h_step'], ['sem3.h_00', 'l4.lhop_00', 'der.x_hop'], { icon: '0/0' }),
     n('h_twice', 'Aplicar-la diversos cops', ['h_00'], ['sem3.h_twice'], { icon: '×2' }),
-    n('h_inf', '∞/∞ i jerarquia', ['h_00'], ['sem3.h_inf', 'l4.lhop_inf'], { icon: '∞/∞', r: '\\ln x\\ll x^a\\ll e^x' }),
+    n('h_inf', '∞/∞ i jerarquia', ['h_00'], ['sem3.h_inf', 'l4.lhop_inf', 'sem3i.lim_dom'], { icon: '∞/∞', r: '\\ln x\\ll x^a\\ll e^x' }),
     n('h_prod', '0·∞', ['h_inf'], ['sem3.h_prod', 'l4.lhop_0inf'], { icon: '0·∞', r: '0\\cdot\\infty=\\frac{0}{1/\\infty}' }),
     n('h_diff', '∞−∞', ['h_twice'], ['sem3.h_diff', 'l4.lhop_diff'], { icon: '∞−∞' }),
-    n('h_exp', '1^∞, 0⁰, ∞⁰', ['h_prod'], ['sem3.h_exp', 'l4.lhop_pow', 'l4.p1_powLimit'], { icon: '1^∞', r: 'f^g=e^{g\\ln f}' }),
+    n('h_exp', '1^∞, 0⁰, ∞⁰', ['h_prod'], ['sem3.h_exp', 'l4.lhop_pow', 'l4.p1_powLimit', 'sem3i.lim_1inf'], { icon: '1^∞', r: 'f^g=e^{g\\ln f}' }),
     n('h_param', 'L\'Hôpital amb paràmetre', ['h_00'], ['l4.lhop_param'], { icon: 'a?' }),
     n('a_vert', 'Asímptotes verticals', ['l_lat'], ['l4.asymp_vert'], { icon: 'x=a' }),
     n('a_horiz', 'Asímptotes horitzontals', ['r_deg'], ['l4.asymp_horiz'], { icon: 'y=b' }),
@@ -68,17 +68,17 @@
 
   /* ---------------- 3. Extrems i estudi de funcions ---------------- */
   const extNodes = [
-    n('e_roots', 'Resoldre equacions', [], ['sem3.e_roots', 'base.quad'], { icon: '=0' }),
+    n('e_roots', 'Resoldre equacions', [], ['sem3.e_roots', 'base.quad', 'sem3r.cubic_zeros'], { icon: '=0' }),
     n('e_sign', 'Taula de signes', ['e_roots'], ['sem3.e_sign', 'base.ineq'], { icon: '+−' }),
-    n('x_crit', 'Punts crítics', ['e_roots'], ['sem3.x_crit', 'l3.crit_cubic', 'der.x_mono'], { icon: "f'=0" }),
-    n('x_mono', 'Creixement', ['x_crit', 'e_sign'], ['sem3.x_mono', 'l3.monotony', 'l3.p1_polyGrowth'], { icon: '↗↘' }),
+    n('x_crit', 'Punts crítics', ['e_roots'], ['sem3.x_crit', 'l3.crit_cubic', 'der.x_mono', 'sem3r.cubic_ext'], { icon: "f'=0" }),
+    n('x_mono', 'Creixement', ['x_crit', 'e_sign'], ['sem3.x_mono', 'l3.monotony', 'l3.p1_polyGrowth', 'sem3r.cubic_mono', 'sem3i.cubic_shape'], { icon: '↗↘' }),
     n('x_rat', 'Extrems de racionals', ['x_mono'], ['l3.crit_rational'], { icon: 'P/Q' }),
     n('x_exp', 'Extrems amb e^x i ln', ['x_mono'], ['l3.crit_exp'], { icon: 'eˣ' }),
     n('x_first', 'Criteri de la 1a derivada', ['x_mono'], ['sem3.x_first'], { icon: "f'" }),
-    n('x_second', 'Criteri de la 2a derivada', ['x_crit'], ['sem3.x_second'], { icon: "f''" }),
+    n('x_second', 'Criteri de la 2a derivada', ['x_crit'], ['sem3.x_second', 'sem3i.extr_type'], { icon: "f''" }),
     n('x_value', 'Valor de l\'extrem', ['x_first'], ['sem3.x_value'], { icon: 'f(c)' }),
-    n('x_infl', 'Concavitat i inflexió', ['x_second'], ['sem3.x_infl', 'l3.inflection', 'der.x_curv'], { icon: '∪∩' }),
-    n('x_abs', 'Extrems absoluts en [a,b]', ['x_value'], ['sem3.x_abs', 'l3.abs_extrema', 'l3.p1_absExtrema'], { icon: '[a,b]' }),
+    n('x_infl', 'Concavitat i inflexió', ['x_second'], ['sem3.x_infl', 'l3.inflection', 'der.x_curv', 'sem3i.infl_mid'], { icon: '∪∩' }),
+    n('x_abs', 'Extrems absoluts en [a,b]', ['x_value'], ['sem3.x_abs', 'l3.abs_extrema', 'l3.p1_absExtrema', 'sem3r.cubic_abs'], { icon: '[a,b]' }),
     n('x_opt', 'Optimització', ['x_abs'], ['l3.optim_basic', 'l3.optim_box', 'l3.optim_page', 'l3.optim_dist'], { icon: '📦' }),
     n('x_study', 'Estudi complet', ['x_infl', 'x_mono'], ['l4.p1_functionStudy'], { icon: '📈' }),
   ];

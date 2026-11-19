@@ -220,7 +220,7 @@
   const topicInfo = t => { const x = store.part(pkey(t)); return { r: x ? x.best : 0, n: x ? x.n : 0, due: store.partDue(pkey(t)), x }; };
 
   /* ---------------- capçalera i pestanyes de l'apartat ---------------- */
-  const TABS = [['', '🗺️ Pla'], ['teoria', '📖 Teoria'], ['ex', '✍️ Exercicis'], ['lli', '🎓 Lliçons'], ['hab', '⚡ Habilitats'], ['sim', '⏱️ Simulacre'], ['original', '📄 Seminari resolt']];
+  const TABS = [['', '🗺️ Pla'], ['rap', '⚡ Ràpids'], ['intu', '🧭 Intuïció'], ['teoria', '📖 Teoria'], ['ex', '✍️ Exercicis'], ['lli', '🎓 Lliçons'], ['hab', '⚡ Habilitats'], ['sim', '⏱️ Simulacre'], ['original', '📄 Seminari resolt']];
   function shell(active, inner) {
     renderSide('seminari');
     const ss = Calc.semStats();
@@ -249,6 +249,8 @@
       [false, '🧾', 'Abans del seminari: la teoria en 10 minuts', 'Les 4 regles (cadena, acotació, signes de f\', graus) i els errors típics.', '#/seminari/teoria', 'Teoria'],
     ];
     const body = shell('', `
+      <a class="card s3rapcta" href="#/seminari/rap"><b>⚡ Poc temps? Fes «Ràpids»</b><span class="muted small"> — preguntes curtes, una per cada pas dels 4 exercicis del seminari (cadena, x^k·sin(1/x), cúbica, P/Q). Números nous cada vegada.</span></a>
+      <a class="card s3rapcta" href="#/seminari/intu"><b>🧭 No ho saps fer? Aprèn a endevinar amb criteri</b><span class="muted small"> — regles de cop d'ull per saber com ha de ser la resposta abans de fer el càlcul, i què escriure a l'examen quan t'encalles.</span></a>
       <div class="card next-card"><div class="row"><div><div class="muted small" style="text-transform:uppercase;letter-spacing:.08em">Preparar el seminari</div>
         <h2 style="margin:2px 0">Pla en 5 passos</h2><div class="muted small">Fes-ho en ordre. El que fas aquí puja el rang de les mateixes habilitats de L1–L4 (i al revés).</div></div></div>
         <ol class="s3plan">${steps.map(([ok, ic, t, why, href, b]) => `<li class="${ok ? 'done' : ''}"><span class="s3chk">${ok ? '✓' : ic}</span><div><b>${t}</b><div class="muted small">${why}</div></div><span class="spacer"></span><a class="btn sm ${ok ? '' : 'primary'}" href="${href}">${b}</a></li>`).join('')}</ol></div>
@@ -382,6 +384,68 @@
     $('#s3end').onclick = () => end(false); $('#s3end2').onclick = () => end(false);
   }
 
+  /* ---------------- #/seminari/rap: exercicis ràpids (estil CalcMaster) ---------------- */
+  function rapPage(only) {
+    const R = (K.rapid || []).filter(g => Calc.srcGen(g.key));
+    const sel = only ? R.filter(g => g.id === only || 'e' + g.ex === only) : R;
+    const rk = g => { const x = Calc.srcData(g.key); return x ? x.best || 0 : 0; };
+    const att = g => { const x = Calc.srcData(g.key); return x ? x.att || 0 : 0; };
+    const rows = [1, 2, 3, 4].map(e => `<div class="card"><div class="row"><b>${esc(K.RAPID_EX[e])}</b><span class="spacer"></span><a class="btn sm" href="#/seminari/rap/e${e}">Practica l'exercici ${e}</a></div>
+      ${R.filter(g => g.ex === e).map(g => { const t = Calc.srcGen(g.key); return `<a class="s3sk" href="#/seminari/rap/${g.id}"><span>${esc(g.title)} <span class="chip">${esc(Calc.byId[t.mod].llista.replace(' + Seminari', ''))}</span></span><span class="spacer"></span><span class="small muted">${att(g)} fets</span>${pill(rk(g))}</a>`; }).join('')}</div>`).join('');
+    const body = shell('rap', `<p class="lead">Preguntes curtes que són <b>els passos dels 4 exercicis del seminari</b>: amb números nous cada vegada, resposta escrita i correcció a l'instant. Cada una compta per al tipus d'exercici de la seva llista (mateix rang que allà).</p>
+      ${only ? `<div class="row small"><a href="#/seminari/rap">← Tots els ràpids</a><span class="spacer"></span><b>${esc(sel.length === 1 ? sel[0].title : K.RAPID_EX[only.slice(1)] || '')}</b></div>` : `<div class="row"><a class="btn primary" href="#/seminari/rap/tot">▶ Sessió ràpida: els 4 exercicis barrejats</a><span class="muted small">Recomanat: 10–15 preguntes. Si una falla, mira la solució i fes-ne una altra del mateix tipus.</span></div>`}
+      <div id="s3rp"></div>${only ? '' : `<div class="grid cols2" style="margin-top:12px">${rows}</div>`}`);
+    void body;
+    if (!only) return;
+    const pool = only === 'tot' ? R : sel;
+    if (!pool.length) return;
+    const gens = []; pool.forEach(g => { const t = Calc.srcGen(g.key); if (!gens.includes(t)) gens.push(t); });
+    U.mountPractice($('#s3rp'), { gens, seedFor: t => { const ss = pool.filter(g => Calc.srcGen(g.key) === t); return Calc.seedFor(t, ss[Math.floor(Math.random() * ss.length)].key); } });
+  }
+
+  /* ---------------- #/seminari/intu: endevinar amb criteri ---------------- */
+  // Regles de cop d'ull per exercici (les dels generadors 🧭 + altres comprovacions útils)
+  const EXTRA = {
+    1: ['Comprova en un punt: calcula f(x) en x=1 i x=1,01 amb la calculadora; (f(1,01)−f(1))/0,01 ha de donar aproximadament el teu f\'(1).',
+        'La capa de fora es deriva <b>deixant el de dins igual</b>: (sin(x²))\' comença amb cos(x²), mai amb cos(x).'],
+    2: ['Per a x^k·sin(1/x): k=0 no contínua · k=1 contínua però no derivable · k=2 derivable però f\' no contínua · k≥3 de classe C¹.',
+        'f\'(0) es calcula <b>per definició</b> (lim de (f(h)−f(0))/h), no posant x=0 a la fórmula de f\'(x).'],
+    3: ['Un polinomi de grau senar no té màxim ni mínim absoluts a ℝ (va a ±∞ pels dos costats).',
+        'Els zeros de f\' només són candidats: si f\' no canvia de signe, no és extrem.',
+        'En un interval tancat [a,b], el màxim absolut és el més gran entre f(a), f(b) i f als crítics de dins.'],
+    4: ['Si surt un número "rar" en un límit de P/Q a l\'infinit, mira els graus: només pot ser 0, aₙ/bₘ o ±∞.',
+        'Signe a −∞: x^(n−m) canvia de signe si n−m és senar.'],
+  };
+  function intuPage(only) {
+    const I = (K.intuit || []).filter(g => Calc.srcGen(g.key));
+    const sel = only ? I.filter(g => g.id === only || 'e' + g.ex === only) : I;
+    const rk = g => { const x = Calc.srcData(g.key); return x ? x.best || 0 : 0; };
+    const att = g => { const x = Calc.srcData(g.key); return x ? x.att || 0 : 0; };
+    const sheet = [1, 2, 3, 4].map(e => `<div class="card"><div class="row"><b>${esc(K.RAPID_EX[e])}</b><span class="spacer"></span>${I.some(g => g.ex === e) ? `<a class="btn sm" href="#/seminari/intu/e${e}">Practica</a>` : ''}</div>
+      <ul class="small s3rules">${I.filter(g => g.ex === e).map(g => `<li><a href="#/seminari/intu/${g.id}"><b>${esc(g.title)}</b></a> ${pill(rk(g))} <span class="muted">(${att(g)} fets)</span><div>🧭 ${esc(g.rule)}</div></li>`).join('')}
+      ${(EXTRA[e] || []).map(t => `<li><div>✔︎ ${t}</div></li>`).join('')}</ul></div>`).join('');
+    shell('intu', `<p class="lead">Quan no saps fer un exercici sencer, no cal deixar-lo en blanc ni respondre a l'atzar. Moltes vegades pots saber <b>com ha de ser la resposta</b> (quants factors té, quin signe, si és 0 o ∞, on és més o menys) amb una regla de cop d'ull. Aquí les entrenes.</p>
+      ${only ? `<div class="row small"><a href="#/seminari/intu">← Totes les regles</a><span class="spacer"></span><b>${esc(sel.length === 1 ? sel[0].title : K.RAPID_EX[only.slice(1)] || '')}</b></div><div id="s3ip"></div>` : `
+      <div class="card"><h3 style="margin-top:0">El mètode en 3 passos (per a qualsevol exercici)</h3><ol class="small">
+        <li><b>Reconeix el tipus.</b> «És una composició», «és 0·acotada», «és P/Q a l'infinit», «és 1^∞». El tipus ja et diu la forma de la resposta.</li>
+        <li><b>Aplica la regla de cop d'ull</b> (les de sota) per tenir una resposta aproximada o almenys la forma.</li>
+        <li><b>Comprova si és plausible:</b> signe, grau, un valor amb la calculadora. Si la teva resposta contradiu la regla, segurament t'has equivocat en un pas.</li></ol>
+        <div class="small muted">A l'examen: si t'encalles, <b>escriu la regla i l'estructura</b> («per la regla de la cadena, f\'=cos(…)·…», «és zero per acotada perquè |sin|≤1»). Sovint és la meitat dels punts.</div></div>
+      <div class="row" style="margin:12px 0"><a class="btn primary" href="#/seminari/intu/tot">▶ Sessió d'intuïció: tot barrejat</a><span class="muted small">Preguntes ràpides de triar; la regla surt a la pista (💡) i a la solució.</span></div>
+      <div class="grid cols2">${sheet}</div>`}`);
+    if (!only) return;
+    const pool = only === 'tot' ? I : sel;
+    if (!pool.length) return;
+    const gens = []; pool.forEach(g => { const t = Calc.srcGen(g.key); if (!gens.includes(t)) gens.push(t); });
+    U.mountPractice($('#s3ip'), { gens, seedFor: t => { const ss = pool.filter(g => Calc.srcGen(g.key) === t); return Calc.seedFor(t, ss[Math.floor(Math.random() * ss.length)].key); } });
+  }
+
+  // Des de qualsevol pràctica: si aquest tipus d'exercici té una regla de cop d'ull, enllaça-la
+  Calc.intuHtml = key => {
+    const g = (K.intuit || []).find(x => { const t = Calc.srcGen(x.key); return t && (t.key === key || x.key === key); });
+    return g ? `<div class="small" style="margin-top:6px">🧭 <b>Per endevinar amb criteri:</b> ${esc(g.rule)} <a href="#/seminari/intu/${g.id}">Entrena-ho →</a></div>` : '';
+  };
+
   /* ---------------- #/seminari/teoria ---------------- */
   function theoryPage() {
     const secs = String(K.theory || '').split(/<h3>/i).slice(1).map(x => { const k = x.indexOf('</h3>'); return [x.slice(0, k), x.slice(k + 5)]; });
@@ -432,6 +496,8 @@
     if (seg[0] === 'sim') return simPage(seg[1]);
     if (seg[0] === 'original') return origPage();
     if (seg[0] === 'teoria') return theoryPage();
+    if (seg[0] === 'rap') return rapPage(seg[1]);
+    if (seg[0] === 'intu') return intuPage(seg[1]);
     return planPage();
   } });
   U.route(); // torna a pintar el menú (grup Seminaris) i la ruta actual

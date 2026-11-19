@@ -47,7 +47,7 @@ $f'>0$ en un interval ⇒ $f$ <b>creixent</b> &nbsp;|&nbsp; $f'<0$ ⇒ <b>decrei
       const fp = M.polyEval(f, p), fq = M.polyEval(f, q);
       const lo = p - 2, hi = q + 2;
       const prob = P.multi('Per a $f(x)=' + M.polyTex(f) + '$, troba l\'abscissa del <b>màxim</b> local i del <b>mínim</b> local.',
-        [{ label: '$x_{\\max}=$', ans: p }, { label: '$x_{\\min}=$', ans: q }],
+        [{ label: '$x_{\\text{màx}}=$', ans: p }, { label: '$x_{\\text{mín}}=$', ans: q }],
         ['$f\'(x)=' + M.polyTex(M.polyDer(f)) + '=6(' + H.xm(p) + ')(' + H.xm(q) + ')$ ⇒ punts crítics $x=' + p + '$ i $x=' + q + '$.',
           'Signe de $f\'$: $+$ a $(-\\infty,' + p + ')$, $-$ a $(' + p + ',' + q + ')$, $+$ a $(' + q + ',+\\infty)$.',
           'Canvi $+\\to-$ en $x=' + p + '$ ⇒ <b>màxim</b>, $f(' + p + ')=' + T(fp) + '$. Canvi $-\\to+$ en $x=' + q + '$ ⇒ <b>mínim</b>, $f(' + q + ')=' + T(fq) + '$.']);
@@ -131,7 +131,7 @@ $f'>0$ en un interval ⇒ $f$ <b>creixent</b> &nbsp;|&nbsp; $f'<0$ ⇒ <b>decrei
     make(r) {
       const k = r.int(1, 5), s = 6 * k;
       return P.multi('D\'una planxa quadrada de $' + s + '$ cm de costat es retalla un quadrat de costat $x$ a cada cantonada i es plega per fer una caixa sense tapa. Troba el $x$ que maximitza el volum i el volum màxim.',
-        [{ label: '$x=$', ans: k }, { label: '$V_{\\max}=$', ans: 2 * s * s * s / 27 }],
+        [{ label: '$x=$', ans: k }, { label: '$V_{\\text{màx}}=$', ans: 2 * s * s * s / 27 }],
         ['$V(x)=x(' + s + '-2x)^2$ amb $0<x<' + s / 2 + '$.', '$V\'(x)=(' + s + '-2x)^2-4x(' + s + '-2x)=(' + s + '-2x)(' + s + '-6x)=0$ ⇒ $x=' + k + '$ (l\'altra, $x=' + s / 2 + '$, dona $V=0$).', '$V(' + k + ')=' + k + '\\cdot' + (s - 2 * k) + '^2=' + 2 * s * s * s / 27 + '$ cm³.']);
     }
   });

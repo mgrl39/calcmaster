@@ -665,3 +665,21 @@ svg.plot .pp.pz { fill: var(--muted); } svg.plot .pp.pmax { fill: var(--bad); } 
   .row > label { max-width: 100%; white-space: normal; flex-wrap: wrap; }
 }
 select { max-width: 100%; }
+
+/* Estudi de funcions */
+.signwrap { max-width: 100%; overflow-x: auto; margin: 6px 0; }
+.signtab { border-collapse: collapse; font-size: .9rem; }
+.signtab th, .signtab td { border: 1px solid var(--border); padding: 4px 8px; text-align: center; white-space: nowrap; }
+.signtab th { background: var(--panel3); }
+.signtab td.pt { background: var(--panel2, transparent); color: var(--muted); font-size: .85rem; }
+.signtab td.pos { color: var(--ok); font-weight: 700; }
+.signtab td.neg { color: var(--bad); font-weight: 700; }
+.blank { display: inline-block; min-width: 2.4em; padding: 0 6px; border-bottom: 2px solid var(--accent); color: var(--accent); font-weight: 700; text-align: center; }
+.cblanks { padding-left: 20px; } .cblanks li { margin-bottom: 8px; line-height: 1.7; }
+.esplan li { margin-bottom: 6px; }
+.essheet .card { margin: 0; }
+.eswrite { margin-top: 8px; padding: 6px 8px; border-left: 3px solid var(--ok); background: var(--ok-soft); border-radius: 6px; }
+.eserr { margin-top: 6px; padding: 6px 8px; border-left: 3px solid var(--bad); background: var(--bad-soft); border-radius: 6px; }
+.estxt { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: inherit; font: inherit; resize: vertical; }
+.esmodel { margin-top: 8px; padding: 8px; border-radius: 8px; background: var(--panel3); }
+.eskey { display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }

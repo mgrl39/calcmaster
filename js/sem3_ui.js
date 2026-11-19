@@ -250,6 +250,7 @@
     ];
     const body = shell('', `
       <a class="card s3rapcta" href="#/seminari/rap"><b>⚡ Poc temps? Fes «Ràpids»</b><span class="muted small"> — preguntes curtes, una per cada pas dels 4 exercicis del seminari (cadena, x^k·sin(1/x), cúbica, P/Q). Números nous cada vegada.</span></a>
+      <a class="card s3rapcta" href="#/estudi"><b>📐 Exercici 3 = estudi de funció: xuleta i conceptes</b><span class="muted small"> — màxim/mínim relatiu, convexa/còncava, inflexió, què cal escriure, i l'estudi complet per apartats com al parcial.</span></a>
       <a class="card s3rapcta" href="#/seminari/intu"><b>🧭 No ho saps fer? Aprèn a endevinar amb criteri</b><span class="muted small"> — regles de cop d'ull per saber com ha de ser la resposta abans de fer el càlcul, i què escriure a l'examen quan t'encalles.</span></a>
       <div class="card next-card"><div class="row"><div><div class="muted small" style="text-transform:uppercase;letter-spacing:.08em">Preparar el seminari</div>
         <h2 style="margin:2px 0">Pla en 5 passos</h2><div class="muted small">Fes-ho en ordre. El que fas aquí puja el rang de les mateixes habilitats de L1–L4 (i al revés).</div></div></div>

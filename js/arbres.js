@@ -51,7 +51,7 @@
     n('r_neg', 'Cap a −∞', ['r_deg'], ['sem3.r_neg'], { icon: '−∞' }),
     n('r_general', 'Quocients: cas general', ['r_neg'], ['sem3.r_general', 'sem3.x_limits', 'sem3r.ratgen'], { icon: 'P/Q' }),
     n('r_root', 'Arrels a l\'infinit', ['r_deg'], ['l1.limit_inf_root'], { icon: '√' }),
-    n('h_form', 'Quin tipus d\'indeterminació és?', ['l_factor'], ['sem3.h_form'], { icon: '?' }),
+    n('h_form', 'Quin tipus d\'indeterminació és?', ['l_factor'], ['sem3.h_form', 'l4.concepts_indet'], { icon: '?' }),
     n('h_step', 'Aplicar la regla (un pas)', ['h_form'], ['sem3.h_step'], { icon: "f'/g'", r: "\\lim\\frac fg=\\lim\\frac{f'}{g'}" }),
     n('h_00', 'L\'Hôpital 0/0', ['h_step'], ['sem3.h_00', 'l4.lhop_00', 'der.x_hop'], { icon: '0/0' }),
     n('h_twice', 'Aplicar-la diversos cops', ['h_00'], ['sem3.h_twice'], { icon: '×2' }),
@@ -70,17 +70,17 @@
   const extNodes = [
     n('e_roots', 'Resoldre equacions', [], ['sem3.e_roots', 'base.quad', 'sem3r.cubic_zeros'], { icon: '=0' }),
     n('e_sign', 'Taula de signes', ['e_roots'], ['sem3.e_sign', 'base.ineq'], { icon: '+−' }),
-    n('x_crit', 'Punts crítics', ['e_roots'], ['sem3.x_crit', 'l3.crit_cubic', 'der.x_mono', 'sem3r.cubic_ext'], { icon: "f'=0" }),
+    n('x_crit', 'Punts crítics', ['e_roots'], ['sem3.x_crit', 'l3.crit_cubic', 'der.x_mono', 'sem3r.cubic_ext', 'l3.concepts_extrem'], { icon: "f'=0" }),
     n('x_mono', 'Creixement', ['x_crit', 'e_sign'], ['sem3.x_mono', 'l3.monotony', 'l3.p1_polyGrowth', 'sem3r.cubic_mono', 'sem3i.cubic_shape'], { icon: '↗↘' }),
     n('x_rat', 'Extrems de racionals', ['x_mono'], ['l3.crit_rational'], { icon: 'P/Q' }),
     n('x_exp', 'Extrems amb e^x i ln', ['x_mono'], ['l3.crit_exp'], { icon: 'eˣ' }),
     n('x_first', 'Criteri de la 1a derivada', ['x_mono'], ['sem3.x_first'], { icon: "f'" }),
     n('x_second', 'Criteri de la 2a derivada', ['x_crit'], ['sem3.x_second', 'sem3i.extr_type'], { icon: "f''" }),
     n('x_value', 'Valor de l\'extrem', ['x_first'], ['sem3.x_value'], { icon: 'f(c)' }),
-    n('x_infl', 'Concavitat i inflexió', ['x_second'], ['sem3.x_infl', 'l3.inflection', 'der.x_curv', 'sem3i.infl_mid'], { icon: '∪∩' }),
+    n('x_infl', 'Concavitat i inflexió', ['x_second'], ['sem3.x_infl', 'l3.inflection', 'der.x_curv', 'sem3i.infl_mid', 'l3.concepts_curv'], { icon: '∪∩' }),
     n('x_abs', 'Extrems absoluts en [a,b]', ['x_value'], ['sem3.x_abs', 'l3.abs_extrema', 'l3.p1_absExtrema', 'sem3r.cubic_abs'], { icon: '[a,b]' }),
     n('x_opt', 'Optimització', ['x_abs'], ['l3.optim_basic', 'l3.optim_box', 'l3.optim_page', 'l3.optim_dist'], { icon: '📦' }),
-    n('x_study', 'Estudi complet', ['x_infl', 'x_mono'], ['l4.p1_functionStudy'], { icon: '📈' }),
+    n('x_study', 'Estudi complet', ['x_infl', 'x_mono'], ['l4.p1_functionStudy', 'estudi.full', 'l4.concepts_estudi'], { icon: '📈' }),
   ];
 
   /* ---------------- 4. Integrar (2n parcial) ---------------- */

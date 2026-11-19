@@ -170,7 +170,7 @@
     const semItems = Object.values(Calc.SEMINARS || {}).map(s => { const st = s.id === 'sem3' && Calc.semStats ? Calc.semStats() : null; return `<a class="item ${active === 'seminari' ? 'active' : ''}" href="${s.href}"><span class="num">S3</span><span class="t">${esc(s.name)}</span>${st ? ring(st.pct) : ''}</a>`; }).join('');
     $('#side').innerHTML =
       item('#/', '🏠', 'Inici', '', 'home') + item('#/temari', '🗂️', 'El meu temari', '', 'temari') + item('#/guia', '❓', 'Com funciona', '', 'guia') + item('#/mestria', '🏆', 'Mestria i constància', '', 'mestria') + item('#/curs', '🎓', 'Què estudiem i per què', '', 'curs') + item('#/cami', '🧭', 'Camí recomanat', '', 'cami') + item('#/mapa', '🗺️', 'Mapa del temari', '', 'mapa') + item('#/arbres', '🌳', 'Arbres d\'habilitats', '', 'arbres') + item('#/nivell', '🔎', 'Test de nivell', '', 'nivell') +
-      grp('prac', 'Practicar', item('#/llistes', '📋', 'Llistes oficials (exercicis)', ldue ? `<span class="chip accent">${ldue}</span>` : '', 'llistes') + item('#/jocs', '🎮', 'Jocs d\'entrenament', '', 'jocs') + item('#/teoremes', '📜', 'Teoremes (fitxes)', '', 'teoremes') + item('#/practice', '🎯', 'Pràctica mixta', '', 'practice') + item('#/mix', '🧩', 'Tria llistes i barreja', '', 'mix') + item('#/repas', '🧠', 'Repàs del dia', due ? `<span class="chip accent">${due}</span>` : '', 'repas') + item('#/review', '🔁', 'Repàs d\'errors', errs ? `<span class="chip warn">${errs}</span>` : '', 'review') + item('#/eines', '🧰', 'Eines per integrar', '', 'eines') + item('#/p1/test', '✅', 'Banc de tests', '', 'p1test')) +
+      grp('prac', 'Practicar', item('#/llistes', '📋', 'Llistes oficials (exercicis)', ldue ? `<span class="chip accent">${ldue}</span>` : '', 'llistes') + item('#/jocs', '🎮', 'Jocs d\'entrenament', '', 'jocs') + item('#/teoremes', '📜', 'Teoremes (fitxes)', '', 'teoremes') + item('#/estudi', '📐', 'Estudi de funcions', '', 'estudi') + item('#/practice', '🎯', 'Pràctica mixta', '', 'practice') + item('#/mix', '🧩', 'Tria llistes i barreja', '', 'mix') + item('#/repas', '🧠', 'Repàs del dia', due ? `<span class="chip accent">${due}</span>` : '', 'repas') + item('#/review', '🔁', 'Repàs d\'errors', errs ? `<span class="chip warn">${errs}</span>` : '', 'review') + item('#/eines', '🧰', 'Eines per integrar', '', 'eines') + item('#/p1/test', '✅', 'Banc de tests', '', 'p1test')) +
       grp('exam', 'Exàmens (el que compta)', item('#/cobertura', '✅', 'Res nou a l\'examen', '', 'cobertura') + item('#/entrena', '🎓', 'Entrenament d\'exàmens', xdue ? `<span class="chip accent">${xdue}</span>` : '', 'entrena') + item('#/p2/sim', '⏱️', 'Simulacre 2n parcial', '', 'p2sim') + item('#/exam', '📝', 'Examen generat', '', 'exam') + item('#/p2', '🔥', 'Exàmens reals 2n parcial', '', 'p2exams') + item('#/p2/temes', '📈', 'Què surt al 2n parcial', '', 'p2temes') + p1Items) +
       (F ? grp('temari', 'Temari 2n parcial (L6–L13)', LMODS.filter(m => Calc.FOCUS_IDS.includes(m.id)).map(modItem).join('')) + grp('temari1', 'Base i 1r parcial (també s\'entrena)', LMODS.filter(m => !Calc.FOCUS_IDS.includes(m.id)).map(modItem).join(''))
         : grp('temari', 'Temari (cada llista)', LMODS.map(modItem).join(''))) +
@@ -193,7 +193,7 @@
   }
   class QView {
     constructor(p, o) {
-      this.p = p; this.o = o || {}; this.hints = 0; this.attempts = 0; this.done = false; this.recorded = false;
+      this.p = Calc.mathSafe ? Calc.mathSafe(p) : p; this.o = o || {}; this.hints = 0; this.attempts = 0; this.done = false; this.recorded = false;
       this.el = document.createElement('div'); this.el.className = 'qcard';
       this.lastInput = null;
       this.build();
@@ -352,7 +352,7 @@
     return gens[i];
   }
   /** Text «de què va» + conceptes necessaris, per a la columna dreta. */
-  const aboutOf = gen => (Calc.rankLine ? Calc.rankLine(gen.key) : '') + (gen.desc ? `<div class="about"><span class="muted small">De què va</span><div>${gen.desc}</div></div>` : '') + refChips(gen.needs, 'Cal saber');
+  const aboutOf = gen => (Calc.rankLine ? Calc.rankLine(gen.key) : '') + (gen.desc ? `<div class="about"><span class="muted small">De què va</span><div>${Calc.ltFix ? Calc.ltFix(gen.desc) : gen.desc}</div></div>` : '') + refChips(gen.needs, 'Cal saber');
   /** Exemple semblant (una altra llavor) amb la solució, per aprendre abans de provar. */
   function exampleHtml(gen, seed) {
     let p; try { p = Calc.make(gen, seed); } catch (e) { return ''; }

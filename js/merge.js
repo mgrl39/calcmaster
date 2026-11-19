@@ -21,6 +21,7 @@
   (Calc.sem3 && Calc.sem3.gens || []).forEach(g => { g.key = 'sem3.' + g.id; byKey[g.key] = g; });
   (Calc.sem3 && Calc.sem3.rapid || []).forEach(g => { g.key = 'sem3r.' + g.id; byKey[g.key] = g; });
   (Calc.sem3 && Calc.sem3.intuit || []).forEach(g => { g.key = 'sem3i.' + g.id; byKey[g.key] = g; });
+  if (Calc.estudi) byKey['estudi.full'] = Calc.estudi.full;
 
   // clau antiga → clau existent (variant)   o   → [mòdul, id nou, títol] (tipus nou)
   const MAP = {
@@ -72,6 +73,8 @@
     'sem3r.chain5': 'l2.chain_multi', 'sem3r.chainval': 'l2.d_val', 'sem3r.xk_class': 'l2.d_class', 'sem3r.xk_der': 'l2.d_mixed', 'sem3r.xk_f0': 'l2.d_def',
     'sem3r.cubic_ext': 'l3.crit_cubic', 'sem3r.cubic_mono': 'l3.monotony', 'sem3r.cubic_abs': 'l3.abs_extrema', 'sem3r.cubic_zeros': 'base.factor',
     'sem3r.ratinf': 'l1.limit_inf', 'sem3r.ratgen': 'l1.limit_inf',
+    // ---- Estudi de funcions (estudi.js): mateixa mestria que l'exercici de parcial ----
+    'estudi.full': 'l4.p1_functionStudy',
     // ---- «🧭 Intuïció» (endevinar amb criteri) ----
     'sem3i.ch_count': 'l2.chain_layers', 'sem3i.ch_pick': 'l2.chain_multi', 'sem3i.bnd_guess': 'l1.lim_bounded',
     'sem3i.lim_dom': 'l4.lhop_inf', 'sem3i.lim_1inf': 'l4.lhop_pow', 'sem3i.plaus_pq': 'l1.limit_inf',

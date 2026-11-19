@@ -36,7 +36,7 @@
   /* ---------- L0: inequació amb valor absolut ---------- */
   add('l0', {
     id: 'ineq_abs', title: 'Inequacions amb valor absolut', level: 1,
-    desc: 'Inequacions $|ax+b|<c$ (un interval) i $|ax+b|>c$ (dos trossos).', needs: ['signe'],
+    desc: 'Inequacions $|ax+b|\\lt c$ (un interval) i $|ax+b|\\gt c$ (dos trossos).', needs: ['signe'],
     make(r) {
       const m = r.int(-4, 4), h = r.int(1, 4), a = r.pick([1, 1, 2, 3]), c = a * h, b = -a * m;
       const rel = r.pick(['<', '\\le', '>', '\\ge']), less = rel === '<' || rel === '\\le', strict = rel === '<' || rel === '>';

@@ -78,9 +78,9 @@
   /** Text de la resposta correcta (LaTeX). */
   Calc.answerTex = function (p) {
     if (p.type === 'mc') return p.choices[p.correct];
-    if (p.type === 'num' || p.type === 'fn') return '$' + (p.ansTex || '') + '$' + (p.utc ? ' $+C$' : '');
+    if (p.type === 'num' || p.type === 'fn') return p.ansTex ? '$' + p.ansTex + '$' + (p.utc ? ' $+C$' : '') : '';
     if (p.type === 'multi' && p.legacy) return '';
-    if (p.type === 'multi') return p.fields.map(f => (f.label ? f.label + ' ' : '') + '$' + (f.ansTex || (f.kind === 'fn' ? M.tex(f.ans) : M.numTex(f.ans))) + '$').join(' &nbsp;·&nbsp; ');
+    if (p.type === 'multi') return p.fields.map(f => { const t = f.ansTex || (f.ans == null ? '' : f.kind === 'fn' ? M.tex(f.ans) : M.numTex(f.ans)); return t ? (f.label ? f.label + ' ' : '') + '$' + t + '$' : ''; }).filter(Boolean).join(' &nbsp;·&nbsp; ');
     return '';
   };
 
@@ -93,8 +93,21 @@
       if (++tries > 60) throw new Error('No es pot generar ' + gen.key);
     }
     p.gkey = gen.key; p.seed = seed; p.title = gen.title; p.level = gen.level;
+    return Calc.mathSafe(p);
+  };
+  /* Dins de $…$, «x<y» el navegador ho llegeix com l'etiqueta <y…> i s'empassa el text que segueix.
+     Es canvia «<» + lletra per «\lt », que KaTeX dibuixa igual. No toca l'HTML de fora de les fórmules. */
+  const ltFix = s => (typeof s === 'string' && s.indexOf('<') >= 0 ? s.replace(/\$\$[\s\S]+?\$\$|\$[^$]+?\$/g, m => m.replace(/<(?=[a-zA-Z])/g, '\\lt ')) : s);
+  Calc.mathSafe = function (p) {
+    if (!p || p._safe) return p;
+    p.q = ltFix(p.q); p.hint = ltFix(p.hint);
+    if (Array.isArray(p.sol)) p.sol = p.sol.map(ltFix);
+    if (Array.isArray(p.choices)) p.choices = p.choices.map(ltFix);
+    if (Array.isArray(p.fields)) p.fields.forEach(f => { f.label = ltFix(f.label); });
+    try { Object.defineProperty(p, '_safe', { value: true }); } catch (e) { /* objecte congelat */ }
     return p;
   };
+  Calc.ltFix = ltFix;
   Calc.newSeed = () => (Math.random() * 4294967295) >>> 0;
 
   /* ------------------------------ Progrés ------------------------------ */

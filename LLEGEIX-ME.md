@@ -22,6 +22,20 @@ El que s'hi entrenava és el mateix coneixement que les llistes, i per això té
   - No té tipus d'exercici propis: les seves peces són tipus d'exercici de L1–L4 i Fonaments.
   - Inclou un pla en 5 passos i la teoria.
   - Té 6 exercicis sencers amb mestria d'apartat (`S3:<tema>`). Cada apartat també suma al tipus d'exercici de la llista corresponent.
+  - Pestanya **⚡ Ràpids** (`js/sem3_rapid.js`): 11 generadors curts a l'estil CalcMaster, un per a cada pas dels 4 exercicis del seminari:
+    - cadena de 3–5 capes i f'(a);
+    - x^k·sin(1/x): classificació, f'(x) i f'(0) / lim f'(x);
+    - cúbica: extrems, inflexió, creixement, absoluts i zeros;
+    - P/Q a l'infinit.
+
+    Són variants dels tipus d'exercici de les llistes (mateixa mestria) i surten també als arbres.
+  - Pestanya **🧭 Intuïció** (també a `js/sem3_rapid.js`, `Calc.sem3.intuit`): 9 generadors per endevinar amb criteri sense fer tot el càlcul:
+    - estructura de la cadena i descartar derivades impossibles;
+    - zero per acotada;
+    - jerarquia d'infinits, 1^∞ i plausibilitat de P/Q;
+    - forma de la cúbica, inflexió al punt mitjà i tipus d'extrem.
+
+    Cada un porta una regla de cop d'ull, que surt com a pista i a la solució. A la pràctica normal, si marques «Dubto» o falles dues vegades un tipus que té regla, el missatge l'enllaça (`Calc.intuHtml`).
   - També té 18 lliçons, un simulacre de 50 minuts (compten els 3 millors de 4) i el full 2023-24 resolt.
 
 Fitxers: `js/sem3_lib.js` (motor del seminari), `js/mod_sem3.js` (habilitats, sense mòdul), `js/sem3_ui.js`,
@@ -38,6 +52,25 @@ Cada tema partit en peces petites amb fletxes «cal saber això abans», com l'a
 - `merge.js` porta un compte per «font» de cada exercici (`p.sub`, desat a `sub` a les dades), sense donar XP extra. Així
   l'arbre pot dir «Arrels: dominat · Exponents negatius: no començat», tot i que totes dues peces són de `l2.d_poly`.
 - Els arbres s'obren des del menú, des del Mapa, des del resum de cada llista i des de les Habilitats del seminari.
+
+## ✍️ Com s'entenen les respostes (intèrpret, `web/js/math.js`)
+
+L'intèrpret de les respostes entén dues maneres d'escriure:
+- **De llibre:** `sin(x)`, `2*x^2`.
+- **Ràpida:** `sinx`, `2xcosx`, `sin^2x`, `sin2x`, `sen x`, `arctg x`, `|x|`, `3,5`, `x²`, `sin⁻¹x`, `log_2 x`, `y'=…`, `+K`.
+
+Les ambigüitats es resolen sempre amb les mateixes regles (R1–R8, explicades al comentari del parser):
+- `e^2x` = e^(2x), però amb espai (`e^2 x`) vol dir e²·x.
+- `sin^23x` = sin²(3x).
+- `sin x^2` = sin(x²).
+- `1/2x` = (1/2)·x.
+
+Quan una escriptura es pot llegir de dues maneres, la vista prèvia ho avisa (⚠️).
+
+Proves:
+- Bateria de 143 casos escrits a mà.
+- Prova de tota la web de més de 37.000 comprovacions: cada resposta correcta escrita de 6 maneres s'ha d'acceptar, i una d'equivocada s'ha de rebutjar.
+- Diferencial: totes les respostes de referència de la web es llegeixen igual que abans.
 
 ## Mestria i constància (`#/mestria`)
 
@@ -184,6 +217,9 @@ web/js/dx_lib.js        motor de Càlcul dx (dades i generadors), aïllat dins w
 web/js/mod_der.js       generadors de derivar (Càlcul dx)
 web/js/mod_int.js       generadors d'integrar (Càlcul dx)
 web/js/arbres.js        arbres d'habilitats (derivades, límits/L'Hôpital, extrems, integrar)
+web/js/sem3_rapid.js    «⚡ Ràpids» del Seminari 3: exercicis curts generats, un per pas dels 4 exercicis
+web/js/estudi.js        estudi complet (variant de l4.p1_functionStudy) i conceptes per escrit de L3/L4
+web/js/estudi_ui.js     #/estudi: xuleta, «explica-ho tu» i pràctica
 web/js/merge.js         fusiona seminari i dx amb les llistes: una sola mestria per a cada coneixement
 web/p1/data/            dades del 1r parcial: llistes resoltes, exàmens, tests, temes, teoria
 web/p2/data/            exàmens del 2n parcial resolts (exams_p2.js) i freqüència de temes
@@ -196,3 +232,17 @@ web/recursos/pdf/       tots els PDFs
 - Nova llista: crea `web/js/mod_lXX.js` amb `Calc.add({...})` (mira `mod_l5.js`) i afegeix-lo a `index.html`.
 - Nou examen: afegeix un objecte a `REAL_EXAMS` (`web/p1/data/exams.js`).
 - Nou generador: `Calc.addGen('l2', {id, title, level, make(r){…}})` i la seva descripció a `learn.js` (`G`).
+
+## Estudi de funcions (`#/estudi`)
+
+- **Xuleta** (`js/estudi_ui.js`): creixent/decreixent, màxim i mínim relatiu, extrems absoluts, convexa/còncava, inflexió, asímptotes, simetria, indeterminacions i L'Hôpital.
+  - Cada targeta diu què és, com es troba, la frase per a l'examen i l'error típic.
+  - Convenció de la llista 3: convexa = ∪.
+  - Té el pla en 4 apartats, com al parcial, i un «✍️ Explica-ho tu» amb un model i punts clau per marcar (es guarda en `localStorage`).
+- **Estudi complet** (`js/estudi.js`, `Calc.estudi.full`): és una variant de `l4.p1_functionStudy`, la mateixa mestria que l'exercici de parcial.
+  - Funcions: x³/(x²−c) (la del parcial), x²/(x−a), x/(x²+c), (x²+c)/x, x⁴−2cx² i x³−3cx.
+  - Apartats: (a) domini, simetria, asímptotes · (b) creixement, extrems · (c) curvatura, inflexió · o tots tres.
+  - Respostes en llistes de punts i unions d'intervals, llegides pel seu propi lector: accepta `√`, `∞`, decimals i qualsevol ordre, i rebutja ajuntar intervals per sobre d'un punt fora del domini.
+  - Les solucions es calculen a partir dels signes de f′ i f″ i porten la taula de signes.
+- **Conceptes per escrit**: 4 tipus nous, `l3.concepts_extrem`, `l3.concepts_curv`, `l4.concepts_indet` i `l4.concepts_estudi`. Són buits per omplir amb la paraula o el símbol; s'accepten sinònims i no compten els accents ni les majúscules.
+- **`Calc.mathSafe`** (`core.js`): dins de `$…$`, canvia `<` + lletra per `\lt` a cada problema, perquè el navegador no ho llegeixi com una etiqueta HTML. Això arregla, per exemple, les funcions a trossos de `l1.cont_two`.

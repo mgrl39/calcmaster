@@ -118,7 +118,9 @@
   /* ------------------------------ Parser ------------------------------ */
   const FUNCS = {
     sin: 'sin', cos: 'cos', tan: 'tan', asin: 'asin', arcsin: 'asin', acos: 'acos', arccos: 'acos', atan: 'atan', arctan: 'atan', arctg: 'atan', tg: 'tan',
-    sinh: 'sinh', cosh: 'cosh', tanh: 'tanh', ln: 'ln', log: 'ln', sqrt: 'sqrt', abs: 'abs', exp: 'exp', cbrt: 'cbrt'
+    sinh: 'sinh', cosh: 'cosh', tanh: 'tanh', ln: 'ln', log: 'ln', sqrt: 'sqrt', abs: 'abs', exp: 'exp', cbrt: 'cbrt',
+    // afegides per a Derivar/Integrar (Càlcul dx)
+    sec: 'sec', csc: 'csc', cosec: 'csc', cot: 'cot', cotg: 'cot', asinh: 'asinh', argsinh: 'asinh', argsh: 'asinh', acosh: 'acosh', argcosh: 'acosh', argch: 'acosh', atanh: 'atanh', argtanh: 'atanh', argth: 'atanh'
   };
 
   function preprocess(s) {
@@ -288,6 +290,8 @@
           case 'sin': return Math.sin(a); case 'cos': return Math.cos(a); case 'tan': return Math.tan(a);
           case 'asin': return Math.asin(a); case 'acos': return Math.acos(a); case 'atan': return Math.atan(a);
           case 'sinh': return Math.sinh(a); case 'cosh': return Math.cosh(a); case 'tanh': return Math.tanh(a);
+          case 'sec': return 1 / Math.cos(a); case 'csc': return 1 / Math.sin(a); case 'cot': return Math.cos(a) / Math.sin(a);
+          case 'asinh': return Math.asinh(a); case 'acosh': return Math.acosh(a); case 'atanh': return Math.atanh(a);
           case 'ln': return Math.log(Math.abs(a)); // ln|x| (lenient)
           case 'sqrt': return Math.sqrt(a); case 'abs': return Math.abs(a); case 'cbrt': return Math.cbrt(a);
         }
@@ -461,6 +465,12 @@
           case 'sinh': o = fn('cosh', u); break;
           case 'cosh': o = fn('sinh', u); break;
           case 'tanh': o = A.sub(num(1), A.pow(fn('tanh', u), num(2))); break;
+          case 'sec': o = A.mul(fn('sec', u), fn('tan', u)); break;
+          case 'csc': o = neg(A.mul(fn('csc', u), fn('cot', u))); break;
+          case 'cot': o = neg(A.pow(fn('csc', u), num(2))); break;
+          case 'asinh': o = A.div(num(1), fn('sqrt', A.add(A.pow(u, num(2)), num(1)))); break;
+          case 'acosh': o = A.div(num(1), fn('sqrt', A.sub(A.pow(u, num(2)), num(1)))); break;
+          case 'atanh': o = A.div(num(1), A.sub(num(1), A.pow(u, num(2)))); break;
           case 'ln': o = A.div(num(1), u); break;
           case 'sqrt': o = A.div(num(1), A.mul(num(2), fn('sqrt', u))); break;
           case 'cbrt': o = A.div(num(1), A.mul(num(3), A.pow(fn('cbrt', u), num(2)))); break;
@@ -490,7 +500,7 @@
   M.nthDiff = function (src, n, v) { let a = typeof src === 'string' ? M.parse(src, [v || 'x']) : src; for (let i = 0; i < n; i++) a = M.diff(a, v); return a; };
 
   /* --------------------------------- LaTeX --------------------------------- */
-  const FTEX = { sin: '\\sin', cos: '\\cos', tan: '\\tan', asin: '\\arcsin', acos: '\\arccos', atan: '\\arctan', sinh: '\\sinh', cosh: '\\cosh', tanh: '\\tanh', ln: '\\ln' };
+  const FTEX = { sin: '\\sin', cos: '\\cos', tan: '\\tan', asin: '\\arcsin', acos: '\\arccos', atan: '\\arctan', sinh: '\\sinh', cosh: '\\cosh', tanh: '\\tanh', ln: '\\ln', sec: '\\sec', csc: '\\csc', cot: '\\cot', asinh: '\\operatorname{argsinh}', acosh: '\\operatorname{argcosh}', atanh: '\\operatorname{argtanh}' };
   function prec(n) {
     switch (n.t) {
       case 'add': case 'sub': return 1;

@@ -166,12 +166,15 @@
     const grp = (id, title, html, closed) => `<details data-g="${id}" ${openState[id] === false || (closed && openState[id] !== true) ? '' : 'open'}><summary>${title}</summary>${html}</details>`;
     const F = Calc.focusOn(), due = Calc.dueCount ? Calc.dueCount() : 0, xdue = Calc.partsDueCount ? Calc.partsDueCount() : 0, ldue = Calc.listsDueCount ? Calc.listsDueCount() : 0;
     const p1Items = item('#/p1/exams', '🔥', 'Exàmens reals 1r parcial', '', 'p1exams') + item('#/p1/sim', '⏱️', 'Simulacre 1r parcial', '', 'p1sim') + item('#/p1/temes', '📈', 'Què surt al 1r parcial', '', 'p1temes') + item('#/p1', '📘', 'Resum 1r parcial', '', 'p1');
+    const LMODS = MODS;
+    const semItems = Object.values(Calc.SEMINARS || {}).map(s => { const st = s.id === 'sem3' && Calc.semStats ? Calc.semStats() : null; return `<a class="item ${active === 'seminari' ? 'active' : ''}" href="${s.href}"><span class="num">S3</span><span class="t">${esc(s.name)}</span>${st ? ring(st.pct) : ''}</a>`; }).join('');
     $('#side').innerHTML =
       item('#/', '🏠', 'Inici', '', 'home') + item('#/temari', '🗂️', 'El meu temari', '', 'temari') + item('#/guia', '❓', 'Com funciona', '', 'guia') + item('#/mestria', '🏆', 'Mestria i constància', '', 'mestria') + item('#/curs', '🎓', 'Què estudiem i per què', '', 'curs') + item('#/cami', '🧭', 'Camí recomanat', '', 'cami') + item('#/mapa', '🗺️', 'Mapa del temari', '', 'mapa') + item('#/nivell', '🔎', 'Test de nivell', '', 'nivell') +
       grp('prac', 'Practicar', item('#/llistes', '📋', 'Llistes oficials (exercicis)', ldue ? `<span class="chip accent">${ldue}</span>` : '', 'llistes') + item('#/jocs', '🎮', 'Jocs d\'entrenament', '', 'jocs') + item('#/teoremes', '📜', 'Teoremes (fitxes)', '', 'teoremes') + item('#/practice', '🎯', 'Pràctica mixta', '', 'practice') + item('#/mix', '🧩', 'Tria llistes i barreja', '', 'mix') + item('#/repas', '🧠', 'Repàs del dia', due ? `<span class="chip accent">${due}</span>` : '', 'repas') + item('#/review', '🔁', 'Repàs d\'errors', errs ? `<span class="chip warn">${errs}</span>` : '', 'review') + item('#/eines', '🧰', 'Eines per integrar', '', 'eines') + item('#/p1/test', '✅', 'Banc de tests', '', 'p1test')) +
       grp('exam', 'Exàmens (el que compta)', item('#/cobertura', '✅', 'Res nou a l\'examen', '', 'cobertura') + item('#/entrena', '🎓', 'Entrenament d\'exàmens', xdue ? `<span class="chip accent">${xdue}</span>` : '', 'entrena') + item('#/p2/sim', '⏱️', 'Simulacre 2n parcial', '', 'p2sim') + item('#/exam', '📝', 'Examen generat', '', 'exam') + item('#/p2', '🔥', 'Exàmens reals 2n parcial', '', 'p2exams') + item('#/p2/temes', '📈', 'Què surt al 2n parcial', '', 'p2temes') + p1Items) +
-      (F ? grp('temari', 'Temari 2n parcial (L6–L13)', MODS.filter(m => Calc.FOCUS_IDS.includes(m.id)).map(modItem).join('')) + grp('temari1', 'Base i 1r parcial (també s\'entrena)', MODS.filter(m => !Calc.FOCUS_IDS.includes(m.id)).map(modItem).join(''))
-        : grp('temari', 'Temari (cada llista)', MODS.map(modItem).join(''))) +
+      (F ? grp('temari', 'Temari 2n parcial (L6–L13)', LMODS.filter(m => Calc.FOCUS_IDS.includes(m.id)).map(modItem).join('')) + grp('temari1', 'Base i 1r parcial (també s\'entrena)', LMODS.filter(m => !Calc.FOCUS_IDS.includes(m.id)).map(modItem).join(''))
+        : grp('temari', 'Temari (cada llista)', LMODS.map(modItem).join(''))) +
+      (semItems ? grp('sem', 'Seminaris (1r parcial)', semItems, true) : '') +
       grp('consulta', 'Consulta', item('#/formulari', '📐', 'Formulari', '', 'formulari') + item('#/p1/teoria', '📚', 'Apunts generals', '', 'p1teoria') + item('#/p1/guia', '🧠', 'Plantilles i errors típics', '', 'p1guia') + item('#/p1/resolts', '🧾', 'Problemes resolts', '', 'p1resolts') + item('#/grafica', '📈', 'Dibuixa una funció', '', 'grafica') + item('#/p1/chuleta', '📝', 'Xuleta', '', 'p1chuleta') + item('#/recursos', '📎', 'PDFs originals', '', 'recursos')) +
       '<div class="sidefoot"><button class="btn sm" id="keysBtn" title="Dreceres de teclat">⌨️ Dreceres</button><button class="btn sm danger" id="resetBtn">🗑️ Reset progrés</button></div>';
     $$('#side details').forEach(d => d.addEventListener('toggle', () => { openState[d.dataset.g] = d.open; try { localStorage.setItem('calcmaster.side', JSON.stringify(openState)); } catch (e) { /* res */ } }));
@@ -204,13 +207,13 @@
       if (p.type === 'mc') {
         h += '<div class="mc">' + p.choices.map((c, i) => `<label class="opt"><input type="radio" name="mc-${this.id()}" value="${i}"><span>${c}</span></label>`).join('') + '</div>';
       } else if (p.type === 'multi') {
-        h += p.fields.map((f, i) => `<div class="ansblock"><div class="ansrow">${f.label ? `<label>${f.label}</label>` : ''}<input class="ans" data-i="${i}" autocomplete="off" spellcheck="false" placeholder="${f.kind === 'fn' ? 'expressió en x' : 'valor'}"></div><div class="preview" data-i="${i}"></div></div>`).join('');
+        h += p.fields.map((f, i) => `<div class="ansblock"><div class="ansrow">${f.label ? `<label>${f.label}</label>` : ''}<input class="ans" data-i="${i}" autocomplete="off" spellcheck="false" placeholder="${f.ph ? esc(f.ph) : f.kind === 'fn' ? 'expressió en x' : 'valor'}"></div><div class="preview" data-i="${i}"></div></div>`).join('');
       } else {
         h += `<div class="ansblock"><div class="ansrow"><input class="ans" data-i="0" autocomplete="off" spellcheck="false" placeholder="${p.type === 'fn' ? 'La teva resposta (p.ex. 3x^2+1)' : 'La teva resposta (p.ex. 3/4 o sqrt(2))'}"></div><div class="preview" data-i="0"></div></div>`;
       }
       h += '</div>';
       if (!this.o.noActions) h += `<div class="actions"><button class="btn primary" data-act="check" title="Enter">Comprova</button><button class="btn ok" data-act="next" title="Enter o N" hidden>Següent →</button><button class="btn" data-act="hint" title="Shift+Enter o H">💡 Pista</button>${this.o.example ? '<button class="btn" data-act="example" title="E">📘 Exemple</button>' : ''}<button class="btn ghost" data-act="solution" title="Ctrl+Enter o S">Solució</button></div>`;
-      if (p.type !== 'mc' && !this.o.noKbd) h += '<div class="kbd">' + KEYS.map(k => `<button type="button" data-ins="${esc(k[1])}">${esc(k[0])}</button>`).join('') + '</div>';
+      if (p.type !== 'mc' && !this.o.noKbd) h += '<div class="kbd">' + (p.keys || KEYS).map(k => `<button type="button" data-ins="${esc(k[1])}">${esc(k[0])}</button>`).join('') + '</div>';
       const about = this.o.about ? `<div class="needbox">${this.o.about}</div>` : '';
       h += `</div><div class="qside">${about}<div class="fbwrap"></div><div class="hintbox" hidden></div><div class="exbox"></div><div class="solwrap"></div></div>`;
       this.el.innerHTML = h;
@@ -259,7 +262,8 @@
     updatePreview(inp) {
       const pv = $('.preview[data-i="' + inp.getAttribute('data-i') + '"]', this.el);
       if (!pv) return;
-      const t = previewTex(inp.value, this.p.v);
+      const fld = this.p.fields && this.p.fields[+inp.getAttribute('data-i')];
+      let t; if (fld && fld.prev) { try { t = String(inp.value).trim() ? fld.prev(inp.value) : ''; } catch (e) { t = null; } } else t = previewTex(inp.value, this.p.v);
       if (t === '' ) pv.textContent = '';
       else if (t === null) pv.textContent = '… (format no reconegut)';
       else { try { katex.render(t, pv, { throwOnError: false }); } catch (e) { pv.textContent = ''; } }

@@ -346,13 +346,17 @@
         if (b && gl) b.insertAdjacentHTML('afterbegin', `<div class="mapgens"><div class="muted small">Exercicis que el fan servir (primer els que menys domines)</div>${gl}</div>`);
       }, { w: 158, lw: 64, per: 6, chars: 18 });
     } else {
-      const depsM = id => (PREREQ[id] || []).map(x => x[0]).filter(byId);
+      // els seminaris són nodes del graf: depenen de les llistes que entrenen (mateixa mestria)
+      const SEM = Calc.SEMINARS || {}, IDS = ORDER.concat(Object.keys(SEM));
+      const depsM = id => SEM[id] ? SEM[id].after.filter(byId) : (PREREQ[id] || []).map(x => x[0]).filter(byId);
       const depth = {}, dep = id => depth[id] != null ? depth[id] : (depth[id] = depsM(id).reduce((a, p) => Math.max(a, dep(p) + 1), 0));
-      ORDER.forEach(dep);
+      IDS.forEach(dep);
       const maxD = Math.max(...Object.values(depth));
-      const rows = []; for (let k = 0; k <= maxD; k++) rows.push({ label: 'Nivell ' + (k + 1), ids: ORDER.filter(id => depth[id] === k) });
-      drawGraph(host, rows.filter(r => r.ids.length), id => { const m = byId(id), mm = store.modMastery(m); const st = statusOf(mm.att, mm.value, mm.acc); return { title: m.llista.replace(' + Seminari', '') + ' · ' + U.sideName(m), val: mm.value, st, tip: `${m.title} — ${STATUS[st]} (${U.pct(mm.value)}%)` }; }, depsM,
-        id => { location.hash = '#/mod/' + id + '/resum'; }, { w: 230, lw: 80, per: 3, chars: 30, gy: 90 });
+      const rows = []; for (let k = 0; k <= maxD; k++) rows.push({ label: 'Nivell ' + (k + 1), ids: IDS.filter(id => depth[id] === k) });
+      drawGraph(host, rows.filter(r => r.ids.length), id => {
+        if (SEM[id]) { const s = Calc.semStats(); const st = statusOf(s.att, s.pct, s.acc); return { title: '📝 ' + SEM[id].name + ' · ' + SEM[id].short, val: s.pct, st, tip: `${SEM[id].name} — entrena L1–L4 en format seminari — ${STATUS[st]} (${U.pct(s.pct)}%)` }; }
+        const m = byId(id), mm = store.modMastery(m); const st = statusOf(mm.att, mm.value, mm.acc); return { title: m.llista.replace(' + Seminari', '') + ' · ' + U.sideName(m), val: mm.value, st, tip: `${m.title} — ${STATUS[st]} (${U.pct(mm.value)}%)` }; }, depsM,
+        id => { location.hash = SEM[id] ? SEM[id].href : '#/mod/' + id + '/resum'; }, { w: 230, lw: 80, per: 3, chars: 30, gy: 90 });
     }
   }
   Calc.routes.push({ re: /^#\/mapa/, fn: mapaPage });

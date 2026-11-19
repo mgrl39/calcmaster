@@ -71,7 +71,17 @@
       ${s.ls ? row('Llista oficial', s.ls.dom, s.ls.n, '#/mod/' + id + '/list', 'Exercicis de la llista de classe a Dominat') : ''}
       ${s.xp.length ? row('Apartats d\'examen', s.xdom, s.xp.length, '#/mod/' + id + '/resum#xparts', 'Apartats d\'exàmens reals d\'aquest tema a Dominat') : ''}
       ${s.due ? `<div class="small">🧠 <b>${s.due}</b> per repassar avui</div>` : ''}
+      ${Calc.appsCardLine ? Calc.appsCardLine(id) : ''}
       <div class="row" style="margin-top:8px"><a class="btn sm primary" href="#/mod/${id}/resum">📊 Resum</a><a class="btn sm" href="#/mod/${id}/theory">📖 Teoria</a><a class="btn sm" href="#/mod/${id}/practice">✍️ Practica</a></div></div>`;
+  }
+  /* Seminaris: no són temes nous, sinó una manera d'entrenar els temes del bloc (mateixa mestria). */
+  function seminarsHtml() {
+    if (!Calc.SEMINARS || !Calc.semStats) return '';
+    const s = Calc.semStats();
+    return `<section class="tgroup tsem"><div class="tghead"><h3 style="margin:0">📝 Seminaris del bloc 1</h3><span class="chip">1r parcial · 20% de la nota final</span><span class="muted small">No són temes nous: entrenen les llistes L1–L4 en format seminari (mateix rang).</span></div>
+      <div class="grid cols3"><a class="card tcard s3link" href="#/seminari"><div class="row"><b>📝 Seminari 3</b><span class="spacer"></span><span class="tpct" style="font-size:1.3rem">${pc(s.pct)}%</span></div>
+        <div class="tq">Cadena, derivada via límit, estudi de funcions, quocients a l'infinit (i L'Hôpital, extrems)</div>
+        <div class="small muted">${s.dom}/${s.n} habilitats de L1–L4 dominades · ${s.tdom}/${s.tn} tipus d'exercici sencer dominats</div></a></div></section>`;
   }
   function temariPage() {
     renderSide('temari');
@@ -96,7 +106,7 @@
         <p class="small">Detalls dels rangs a <a href="#/guia">❓ Com funciona</a>.</p></details>
       <div class="card focusbox" id="fbox"></div>
       ${GROUPS.filter(g => g.ids.length).map(g => `<section class="tgroup"><div class="tghead"><h2>${g.n ? 'Bloc ' + g.n + ' · ' : ''}${esc(g.t)}</h2><span class="chip">${esc(g.par)}</span><span class="muted">${g.q}</span><span class="spacer"></span><span class="tgpct">${pc(grpPct(g))}%</span></div>
-        <div class="grid cols3">${g.ids.map(id => temaCard(id, focus)).join('')}</div></section>`).join('')}`;
+        <div class="grid cols3">${g.ids.map(id => temaCard(id, focus)).join('')}</div></section>${g.id === 'b1' ? seminarsHtml() : ''}`).join('')}`;
     const drawFocus = () => {
       const f = getFocus(), gens = f.flatMap(id => Calc.byId[id].gens);
       $('#fbox').innerHTML = f.length
@@ -162,6 +172,7 @@
         <div class="card stat"><b>${s.ls ? s.ls.dom + '/' + s.ls.n : '—'}</b><span>llista oficial dominada</span></div>
         <div class="card stat"><b>${s.xp.length ? s.xdom + '/' + s.xp.length : '—'}</b><span>apartats d'examen dominats</span></div></div>
       <div class="card next-card" style="margin-top:12px"><div class="row"><div><div class="muted small" style="text-transform:uppercase;letter-spacing:.08em">Què faig ara en aquest tema?</div><h3 style="margin:2px 0">${na.t}</h3><div class="muted small">${na.why}</div></div><span class="spacer"></span><a class="btn primary" href="${na.href}">${na.btn}</a></div></div>
+      ${Calc.appsResum ? Calc.appsResum(m.id) : ''}
       <h2>Tots els tipus d'exercici del tema</h2><p class="muted small">Agrupats pel concepte de teoria que treballen. Encert = últims intents (pesa més el recent). 🔥 = quant surt a l'examen.</p>
       <div class="tablewrap card"><table class="tbl"><tr><th>Tipus d'exercici</th><th>Rang</th><th>Encert</th><th>Intents</th><th>Examen</th></tr>${rows}</table></div>
       ${xp ? `<h2 id="xparts">Apartats d'exàmens reals d'aquest tema</h2><div class="tablewrap card"><table class="tbl"><tr><th>Examen</th><th>Apartat</th><th>Rang</th></tr>${xp}</table></div><p class="small"><a href="#/entrena">🎓 Entrena'ls</a></p>` : ''}`;
@@ -176,7 +187,7 @@
      ================================================================ */
   const CYCLE = [
     ['1', '📖', 'Entendre', 'Saber què és i per què funciona.', [['#/temari', '🗂️ El meu temari'], ['#/mapa', '🗺️ Mapa'], ['', '📊 Resum i 📖 Teoria de cada tema']], 'Quan comences un tema o quan un exercici et sona a xinès.'],
-    ['2', '✍️', 'Practicar', 'Fer exercicis nous (números diferents cada cop) fins que surtin sols.', [['', '✍️ Pràctica de cada tema'], ['#/focus', '🎯 El meu focus'], ['#/jocs', '🎮 Jocs (mètode, errors, teoremes)']], 'Cada dia. És el que fa pujar els rangs.'],
+    ['2', '✍️', 'Practicar', 'Fer exercicis nous (números diferents cada cop) fins que surtin sols.', [['', '✍️ Pràctica de cada tema'], ['#/focus', '🎯 El meu focus'], ['#/jocs', '🎮 Jocs (mètode, errors, teoremes)'], ['#/seminari', '⭐ Seminari 3'], ['#/mod/der/practice', 'f′ Derivar'], ['#/mod/int/practice', '∫ Integrar']], 'Cada dia. És el que fa pujar els rangs.'],
     ['3', '📋', 'Llistes oficials', 'Els exercicis de classe, en paper, amb la solució verificada.', [['#/llistes', '📋 Llistes oficials']], 'Quan un tipus ja et surt: comprova que saps fer els de veritat.'],
     ['4', '🧠', 'Consolidar', 'Repassar just quan t\'ho demana el sistema (abans que s\'oblidi).', [['#/repas', '🧠 Repàs del dia'], ['#/review', '🔁 Repàs d\'errors']], 'Cada dia, primer de tot (5–15 min).'],
     ['5', '🎓', 'Examen', 'Resoldre exàmens reals i simulacres amb temps, i corregir-te el procediment.', [['#/entrena', '🎓 Entrenament d\'exàmens'], ['#/p2/sim', '⏱️ Simulacre 2n parcial'], ['#/cobertura', '✅ Res nou a l\'examen']], 'Quan un bloc està a Competent o més, i un simulacre per setmana.']
@@ -220,6 +231,7 @@
     [/^#\/focus/, 2, 'Practica barrejat només els temes que has triat.', 'Quan vols concentrar-te en uns temes concrets.'],
     [/^#\/(practice|mix)/, 2, 'Exercicis barrejats de diversos temes (com a l\'examen, on no et diuen el tema).', 'Quan ja tens els temes treballats per separat.'],
     [/^#\/jocs|^#\/joc\//, 2, 'Jocs que entrenen el que fer exercicis no entrena: velocitat, reconèixer el mètode, trobar errors, teoremes.', 'Per escalfar o quan estàs cansat.'],
+    [/^#\/seminari/, 5, 'El Seminari 3: pla per arribar-hi a punt, exercicis sencers amb mestria, lliçons i simulacre de 50 minuts.', 'Els dies abans del seminari.'],
     [/^#\/teoremes/, 1, 'Enunciats exactes dels teoremes: tapa\'ls, escriu-los i compara.', 'Abans de l\'examen i quan un exercici diu «justifica».'],
     [/^#\/eines/, 2, 'Les eines de base que surten dins de cada exercici del 2n parcial.', 'Si falles integrals per culpa de l\'àlgebra o les derivades.'],
     [/^#\/llistes/, 3, 'Totes les llistes de classe, amb el teu progrés.', 'Per triar quina llista fer.'],

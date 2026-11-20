@@ -1,4 +1,4 @@
-/* Llista 7 — Mètode de Newton i primitives (immediates, substitució, parts, trigonomètriques) */
+/* Llista 7 — Mètode de Newton i primitives (immediates, substitució, parts, polinomis trigonomètrics, no elementals) */
 (function () {
   'use strict';
   const P = Calc.P, T = M.numTex;
@@ -11,7 +11,7 @@ $\\displaystyle x_{n+1}=x_n-\\frac{f(x_n)}{f'(x_n)}$
 <ul>
 <li>Idea: tria $x_0$ proper a l'arrel, traça la tangent en $(x_n,f(x_n))$ i pren on talla l'eix $x$.</li>
 <li>Convergència <b>quadràtica</b> (els decimals correctes es dupliquen cada iteració) si $f'\\ne0$ i $x_0$ és prou proper. Falla si $f'(x_n)\\approx0$.</li>
-<li><b>Per trobar un extrem</b> de $f$ (mínim, màxim) o un <b>punt d'inflexió</b>: aplica Newton a $g=f'$ (extrem) o a $g=f''$ (inflexió): $x_{n+1}=x_n-\\dfrac{f'(x_n)}{f''(x_n)}$.</li>
+<li><b>Per trobar un extrem</b> de $f$ (mínim, màxim) o un <b>punt d'inflexió</b>: aplica Newton a $g=f'$ (extrem) o a $g=f''$ (inflexió): $$x_{n+1}=x_n-\\dfrac{f'(x_n)}{f''(x_n)}$$</li>
 <li>Per "sis xifres decimals correctes": itera fins que $|x_{n+1}-x_n|<5\\cdot10^{-7}$ (treballa amb 7–8 decimals a la calculadora). Un mínim absolut en $[a,b]$: compara amb els extrems.</li>
 </ul>
 <div class="box ex"><b>Exemple.</b> $\\sqrt2$: $f=x^2-2$, $x_{n+1}=\\frac12\\left(x_n+\\frac2{x_n}\\right)$. De $x_0=1.5$: $1.41667,\\ 1.414216,\\ 1.414214$.</div>
@@ -37,11 +37,35 @@ $\\displaystyle x_{n+1}=x_n-\\frac{f(x_n)}{f'(x_n)}$
 <li>$\\int e^x\\sin x$: dues parts i <b>reapareix la integral inicial</b>: aïlla-la.</li>
 </ul>
 
-<h3>Integrals trigonomètriques (del resum)</h3>
+<h3>Polinomis trigonomètrics: $\\int\\sin^nx\\cos^mx\\,dx$</h3>
+<p>Són sumes de termes $k\\sin^nx\\cos^mx$. Surten sovint perquè qualsevol senyal es pot veure com una suma de sinus i cosinus (energia, potència…). <b>Sempre es poden resoldre</b>:</p>
 <ul>
-<li>Potència <b>senar</b> de $\\sin$ (o $\\cos$): separa un factor i usa $\\sin^2=1-\\cos^2$; posa $u=\\cos x$. Ex: $\\int\\sin^3x\\cos^2x\\,dx=\\int(1-\\cos^2x)\\cos^2x\\sin x\\,dx=-\\frac{\\cos^3x}{3}+\\frac{\\cos^5x}{5}+C$.</li>
-<li>Potències <b>parelles</b>: $\\sin^2x=\\frac{1-\\cos2x}{2}$, $\\cos^2x=\\frac{1+\\cos2x}2$.</li>
+<li><b>Alguna potència senar:</b> te'n guardes un $\\sin x$ (o $\\cos x$) <b>de la potència senar</b> i la resta la passes a l'altra funció amb $\\sin^2x+\\cos^2x=1$. Queda una quasi immediata. (Si ho fas amb la potència parella, no funciona: no et queda cap factor que faci de derivada.)</li>
+<li><b>Totes dues parelles:</b> ho passes tot a una funció i <b>baixes el grau</b> amb l'angle doble: $\\cos^2x=\\frac{1+\\cos2x}{2}$, $\\sin^2x=\\frac{1-\\cos2x}{2}$ (surten de sumar i restar $1=\\sin^2x+\\cos^2x$ i $\\cos2x=\\cos^2x-\\sin^2x$).</li>
 </ul>
+<div class="box formula">Quasi immediates: $\\displaystyle\\int\\sin x\\cos^nx\\,dx=-\\frac{\\cos^{n+1}x}{n+1}+C$ &nbsp;&nbsp; $\\displaystyle\\int\\cos x\\sin^nx\\,dx=\\frac{\\sin^{n+1}x}{n+1}+C$</div>
+<p><b>Exemple</b> (integrem cada tros per separat):</p>
+<p>$$\\int\\left(\\sqrt2\\sin^5x\\cos^2x-\\pi\\sin^6x\\cos^5x+\\tfrac32\\sin^2x\\cos^2x\\right)dx$$</p>
+<details class="theory"><summary><b>Tros 1</b>: sinus senar ($\\sin^5x\\cos^2x$)</summary>
+<p>$$\\int\\sin^5x\\cos^2x\\,dx=\\int\\sin x(1-\\cos^2x)^2\\cos^2x\\,dx=\\int\\sin x(\\cos^2x-2\\cos^4x+\\cos^6x)\\,dx$$</p>
+<p>$$=-\\left(\\frac{\\cos^3x}{3}-\\frac{2\\cos^5x}{5}+\\frac{\\cos^7x}{7}\\right)+C$$</p>
+</details>
+<details class="theory"><summary><b>Tros 2</b>: cosinus senar ($\\sin^6x\\cos^5x$)</summary>
+<p>$$\\int\\sin^6x\\cos^5x\\,dx=\\int(\\sin^6x-2\\sin^8x+\\sin^{10}x)\\cos x\\,dx=\\frac{\\sin^7x}{7}-\\frac{2\\sin^9x}{9}+\\frac{\\sin^{11}x}{11}+C$$</p>
+</details>
+<details class="theory"><summary><b>Tros 3</b>: tot parell ($\\sin^2x\\cos^2x$)</summary>
+<p>$$\\int\\sin^2x\\cos^2x\\,dx=\\int\\cos^2x\\,dx-\\int\\cos^4x\\,dx$$</p>
+<p>$$\\int\\cos^2x\\,dx=\\frac12\\left(x+\\frac{\\sin2x}{2}\\right)+C$$</p>
+<p>$$\\int\\cos^4x\\,dx=\\frac14\\int\\big(1+2\\cos2x+\\cos^22x\\big)dx=\\frac{3x}{8}+\\frac{\\sin2x}{4}+\\frac{\\sin4x}{32}+C$$</p>
+<p>$$\\int\\sin^2x\\cos^2x\\,dx=\\frac{x}{8}-\\frac{\\sin4x}{32}+C$$</p>
+</details>
+<div class="box formula">Resultat: $$-\\sqrt2\\left(\\frac{\\cos^3x}{3}-\\frac{2\\cos^5x}{5}+\\frac{\\cos^7x}{7}\\right)-\\pi\\left(\\frac{\\sin^7x}{7}-\\frac{2\\sin^9x}{9}+\\frac{\\sin^{11}x}{11}\\right)+\\frac32\\left(\\frac{x}{8}-\\frac{\\sin4x}{32}\\right)+C$$</div>
+<div class="box ex"><b>Idea clau:</b> si hi ha una potència senar, te'n guardes una; si tot és parell, baixes el grau.</div>
+
+<h3>Integrals no elementals: $e^{x^2}$</h3>
+<p>Per parts, $\\displaystyle\\int1\\cdot\\ln x\\,dx=x\\ln x-\\int x\\cdot\\frac1x\\,dx=x\\ln x-x+C$. El mateix truc amb $e^{x^2}$ no funciona:</p>
+<p>$$\\int1\\cdot e^{x^2}dx=xe^{x^2}-2\\int x^2e^{x^2}dx\\quad\\text{(queda pitjor)}$$</p>
+<div class="box warn">La primitiva de $e^{x^2}$ <b>existeix</b>, però no es pot escriure com a composició de funcions elementals. Només es pot expressar com una integral: $\\displaystyle F(x)=\\int_0^x e^{t^2}\\,dt$ (pel teorema fonamental, $F'(x)=e^{x^2}$). El mateix passa amb $e^{-x^2}$ (la campana de Gauss, clau en probabilitat), $\\sin(x^2)$, $\\frac{\\sin x}{x}$… En canvi $x\\,e^{x^2}$ sí que en té: $\\frac12e^{x^2}$ (la $x$ fa de derivada de $x^2$).</div>
 `;
 
   const gens = [];
@@ -203,6 +227,9 @@ $\\displaystyle x_{n+1}=x_n-\\frac{f(x_n)}{f'(x_n)}$
       { q: 'A $\\int x\\ln x\\,dx$ per parts, $u$ és…', c: ['$x$', '$\\ln x$', '$x\\ln x$', 'cap'], a: 1, e: 'LIATE: la logarítmica primer.' },
       { q: '$\\int e^x\\sin x\\,dx$ es resol…', c: ['per substitució', 'per parts dues vegades i aïllant la integral', 'amb fraccions simples', 'no té primitiva'], a: 1, e: 'Cas cíclic.' },
       { q: '$\\int\\cos^2x\\,dx=$', c: ['$\\frac{\\cos^3x}3$', '$\\frac x2+\\frac{\\sin2x}4+C$', '$\\sin^2x$', '$-\\frac{\\sin^3x}{3}$'], a: 1, e: '$\\cos^2x=\\frac{1+\\cos2x}2$.' },
+      { q: 'A $\\int\\sin^4x\\cos^3x\\,dx$, què et guardes?', c: ['un $\\cos x$ (la potència senar)', 'un $\\sin x$', 'res: angle doble', 'per parts'], a: 0, e: 'Guarda un factor de la potència senar i passa la resta amb $\\cos^2=1-\\sin^2$.' },
+      { q: '$\\int\\sin^2x\\cos^2x\\,dx=$', c: ['$\\frac x8-\\frac{\\sin4x}{32}+C$', '$\\frac{\\sin^3x\\cos^3x}{9}$', '$\\frac x4+C$', '$\\frac{\\sin^2 2x}{4}$'], a: 0, e: 'Tot parell: angle doble, $\\sin^2x\\cos^2x=\\frac{1-\\cos4x}{8}$.' },
+      { q: 'La primitiva de $e^{x^2}$…', c: ['és $\\frac{e^{x^2}}{2x}$', 'existeix però no és elemental: $\\int_0^xe^{t^2}dt$', 'no existeix', 'és $xe^{x^2}$'], a: 1, e: 'Contínua ⇒ té primitiva (TFC), però no s\'escriu amb funcions elementals.' },
       { q: '$\\int2x\\,e^{x^2}dx=$', c: ['$e^{x^2}+C$', '$2e^{x^2}$', '$x^2e^{x^2}$', '$e^{2x}$'], a: 0, e: '$u=x^2$.' },
       { q: 'La convergència del mètode de Newton és…', c: ['lineal', 'quadràtica (si $f\'\\ne0$ i $x_0$ proper)', 'sempre garantida', 'cúbica'], a: 1, e: 'Els decimals correctes es dupliquen.' }
     ]

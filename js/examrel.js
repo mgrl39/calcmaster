@@ -19,8 +19,8 @@
     l4: { asymp_oblique: 3, asymp_horiz: 3, asymp_vert: 3, asymp_exp: 2, lhop_00: 2, lhop_inf: 2, lhop_0inf: 2, lhop_pow: 2, lhop_diff: 2, lhop_param: 1, p1_asymptote: 3, p1_functionStudy: 3, p1_powLimit: 2, lhop_form: 2, lhop_step: 2, concepts_indet: 2, concepts_estudi: 2 },
     l5: { mclaurin_mix: 1, coef: 1, poly0: 2, polya: 2, value: 2, degree: 2, err_ln: 2, p1_taylorValue: 2, p1_taylorError: 2, p1_taylorProblem: 3, p1_taylorDegree: 2 },
     l6: { basis: 1, dd: 1, newton_coefs: 1, poly: 1, value: 1, bound: 1, p1_interpolation: 1 },
-    l7: { newton: 0, newton_extreme: 0, p1_newton: 0, linear: 2, split: 2, subst: 3, parts: 3, trigint: 2, parts_cyc: 1, parts_log: 2, trigsub: 1, comprova: 1 },
-    l8: { coef2: 3, coef3: 3, int_simple: 3, int_repeated: 3, int_arctan: 3, polydiv: 2, int_improper: 2, int_mixed: 3, int_cubic: 2, int_dbl_simple: 3 },
+    l7: { newton: 0, newton_extreme: 0, p1_newton: 0, linear: 2, split: 2, subst: 3, parts: 3, trigint: 2, parts_cyc: 1, parts_log: 2, trigsub: 1, comprova: 1, trig_odd: 3, trig_even: 3, trig_strategy: 2, trigpoly: 2, nonelem: 1 },
+    l8: { coef2: 3, coef3: 3, int_simple: 3, int_repeated: 3, int_arctan: 3, polydiv: 2, int_improper: 2, int_mixed: 3, int_cubic: 2, int_dbl_simple: 3, quasi_log: 2, first_step: 2, polydiv_cubic: 2, ruffini_irr: 2, decomp_form: 2, coef_irr: 2, int_full_irr: 3 },
     l9: { volume_washer: 2, volume_shell: 2, improper: 1, defint: 3, signed_area: 1, leibniz: 3, ftc_value: 3, ftc_crit: 1, area_between: 3, area_axis: 3, volume: 2, mean: 0, riemann: 0, trapez: 0, simpson: 0, arclen: 0, surface: 0, leibniz_adv: 3, ftc_concav: 1, area_parts: 3, area_param: 2, volume_adv: 3 },
     // Derivar i Integrar (portats de Càlcul dx): eines que surten dins d'altres exercicis
     l10: { classify: 1, verify: 1, separable: 3, logistic: 2, equilibria: 1, growth: 3, epidemic: 2, sep_more: 3, ode_subst: 2, growth_lim: 2 },

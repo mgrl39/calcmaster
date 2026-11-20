@@ -683,3 +683,39 @@ select { max-width: 100%; }
 .estxt { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: inherit; font: inherit; resize: vertical; }
 .esmodel { margin-top: 8px; padding: 8px; border-radius: 8px; background: var(--panel3); }
 .eskey { display: flex; gap: 6px; align-items: flex-start; margin-top: 4px; }
+
+/* ----- 📊 Gràfics (grafics.js) ----- */
+:root { --gx-s1: #3987e5; --gx-s2: #d95926; --gx-none: #343849; --gx-r0: #646b86;
+  --gx-r1: #184f95; --gx-r2: #256abf; --gx-r3: #3987e5; --gx-r4: #6da7ec; --gx-r5: #9ec5f4; --gx-r6: #cde2fb; }
+.gx h2 { margin-top: 0; } .gx .card h3 { font-size: 1rem; margin: 18px 0 6px; color: var(--muted); }
+.gx-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin: 14px 0 18px; }
+.gx-tile, .gx-ring { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; text-align: center; }
+.gx-big { font-size: 1.7rem; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; } .gx-big small { font-size: .9rem; color: var(--muted); font-weight: 600; }
+.gx-tl { font-size: .82rem; color: var(--text); font-weight: 600; margin-top: 2px; } .gx-sub { font-size: .74rem; color: var(--muted); }
+.gx-ring svg { display: block; margin: 0 auto; } .gx-ring-bg { fill: none; stroke: var(--panel3); stroke-width: 9; } .gx-ring-fg { fill: none; stroke: var(--gx-s1); stroke-width: 9; stroke-linecap: round; }
+.gx-ring text { fill: var(--text); font-size: 17px; font-weight: 800; }
+.gx-hb { display: grid; gap: 5px; margin: 8px 0; }
+.gx-row { display: grid; grid-template-columns: minmax(120px, 34%) 1fr 48px; gap: 10px; align-items: center; font-size: .86rem; }
+.gx-lab { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); } .gx-lab a { color: var(--text); }
+.gx-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 600; }
+.gx-track { position: relative; height: 14px; }
+.gx-grid i { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--grid); }
+.gx-bar { position: absolute; left: 0; top: 0; bottom: 0; background: var(--gx-s1); border-radius: 0 4px 4px 0; min-width: 2px; }
+.gx-bar.gx-warnbar { background: var(--gx-s2); }
+.gx-axis { margin-top: 2px; } .gx-ticks { height: 16px; } .gx-ticks span { position: absolute; transform: translateX(-50%); font-size: .7rem; color: var(--muted); }
+.gx-stack { display: flex; gap: 2px; height: 16px; border-radius: 4px; overflow: hidden; } .gx-stack b { display: block; min-width: 3px; }
+.gx-sep { height: 6px; }
+.gx-leg { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .78rem; color: var(--muted); margin: 6px 0; }
+.gx-leg i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.gx-svg { display: block; width: 100%; height: 170px; overflow: visible; }
+.gx-gl { stroke: var(--grid); stroke-width: 1; } .gx-ax { fill: var(--muted); font-size: 11px; }
+.gx-line { fill: none; stroke: var(--gx-s1); stroke-width: 2; stroke-linejoin: round; } .gx-dot { fill: var(--gx-s1); stroke: var(--panel2); stroke-width: 2; }
+.gx-chip { font-size: .66rem; padding: 0 6px; } .gx-fire { font-size: .72rem; }
+.gx-tbl { margin-top: 10px; font-size: .86rem; } .gx-tbl summary { cursor: pointer; color: var(--accent); }
+.gx-tbl .tblwrap { overflow-x: auto; } .gx-tbl table { font-size: .82rem; }
+#gxtip { position: fixed; z-index: 90; max-width: 320px; pointer-events: none; background: var(--panel3); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: .8rem; line-height: 1.45; box-shadow: 0 6px 22px rgba(0, 0, 0, .35); }
+@media (max-width: 700px) { .gx-row { grid-template-columns: 1fr 40px; gap: 2px 8px; font-size: .8rem; } .gx-row .gx-lab { grid-column: 1 / -1; white-space: normal; line-height: 1.3; margin-top: 4px; } .gx-axis .gx-lab { display: none; } .gx-tiles { grid-template-columns: repeat(2, 1fr); } .gx-svg { height: 140px; } }
+/* resum de cada arbre (arbres.js) */
+.tsum .card { margin: 0; } .tsum .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.chip.bad { background: var(--bad-soft); color: var(--bad); border-color: transparent; }
+.tsum .chip { white-space: normal; text-align: left; }
